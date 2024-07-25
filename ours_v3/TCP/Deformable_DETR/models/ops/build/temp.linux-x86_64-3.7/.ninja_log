@@ -1,0 +1,4 @@
+# ninja log v5
+0	3988	1720539014263070330	/workspace/source/E2E-AD/ours_v3/TCP/Deformable_DETR/models/ops/build/temp.linux-x86_64-3.7/workspace/source/E2E-AD/ours_v3/TCP/Deformable_DETR/models/ops/src/cpu/ms_deform_attn_cpu.o	87c900833e616bef
+0	17145	1720539027414748297	/workspace/source/E2E-AD/ours_v3/TCP/Deformable_DETR/models/ops/build/temp.linux-x86_64-3.7/workspace/source/E2E-AD/ours_v3/TCP/Deformable_DETR/models/ops/src/vision.o	b36035cc93e4916c
+0	20245	1720539030513672221	/workspace/source/E2E-AD/ours_v3/TCP/Deformable_DETR/models/ops/build/temp.linux-x86_64-3.7/workspace/source/E2E-AD/ours_v3/TCP/Deformable_DETR/models/ops/src/cuda/ms_deform_attn_cuda.o	348dd1686976deb7

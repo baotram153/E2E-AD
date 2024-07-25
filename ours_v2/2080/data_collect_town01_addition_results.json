@@ -1,0 +1,3017 @@
+{
+    "_checkpoint": {
+        "global_record": {
+            "index": -1,
+            "infractions": {
+                "collisions_layout": 0.061638605457449945,
+                "collisions_pedestrian": 0.07607619781806034,
+                "collisions_vehicle": 2.7650500624612357,
+                "outside_route_lanes": 0.0,
+                "red_light": 6000.0,
+                "route_dev": 0.0,
+                "route_timeout": 1.7880627886093685,
+                "stop_infraction": 0.0,
+                "vehicle_blocked": 0.5277851407517713
+            },
+            "meta": {
+                "exceptions": [
+                    [
+                        "RouteScenario_0",
+                        0,
+                        "Completed"
+                    ],
+                    [
+                        "RouteScenario_1",
+                        1,
+                        "Completed"
+                    ],
+                    [
+                        "RouteScenario_2",
+                        2,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_8",
+                        8,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_10",
+                        10,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_13",
+                        13,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_17",
+                        17,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_18",
+                        18,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_23",
+                        23,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_24",
+                        24,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_26",
+                        26,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_29",
+                        29,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_38",
+                        38,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_39",
+                        39,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_40",
+                        40,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_43",
+                        43,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_46",
+                        46,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_50",
+                        50,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_55",
+                        55,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_56",
+                        56,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_58",
+                        58,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_61",
+                        61,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_63",
+                        63,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_65",
+                        65,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_68",
+                        68,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_73",
+                        73,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_74",
+                        74,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_75",
+                        75,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_82",
+                        82,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_84",
+                        84,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_85",
+                        85,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_86",
+                        86,
+                        "Failed - Agent got blocked"
+                    ],
+                    [
+                        "RouteScenario_88",
+                        88,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_89",
+                        89,
+                        "Failed - Agent timed out"
+                    ],
+                    [
+                        "RouteScenario_91",
+                        91,
+                        "Failed"
+                    ],
+                    [
+                        "RouteScenario_93",
+                        93,
+                        "Failed - Agent timed out"
+                    ]
+                ]
+            },
+            "route_id": -1,
+            "scores": {
+                "score_composed": 81.80317767520668,
+                "score_penalty": 0.9335000000000001,
+                "score_route": 84.17525460023374
+            },
+            "status": "Failed"
+        },
+        "progress": [
+            100,
+            100
+        ],
+        "records": [
+            {
+                "index": 0,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 65.50000097602606,
+                    "duration_system": 144.0356240272522,
+                    "route_length": 159.3252046751897,
+                    "total_steps": 1309
+                },
+                "route_id": "RouteScenario_0",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 1,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 139.75000208243728,
+                    "duration_system": 392.83827233314514,
+                    "route_length": 128.19666604290262,
+                    "total_steps": 2794
+                },
+                "route_id": "RouteScenario_1",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 2,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 33.600000500679016,
+                    "duration_system": 122.4730715751648,
+                    "route_length": 173.11485423098293,
+                    "total_steps": 671
+                },
+                "route_id": "RouteScenario_2",
+                "scores": {
+                    "score_composed": 37.497011472170776,
+                    "score_penalty": 1.0,
+                    "score_route": 37.497011472170776
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 3,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 76.10000113397837,
+                    "duration_system": 150.75507378578186,
+                    "route_length": 137.4007792171605,
+                    "total_steps": 1521
+                },
+                "route_id": "RouteScenario_3",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 4,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 58.55000087246299,
+                    "duration_system": 89.36379790306091,
+                    "route_length": 157.59266070266378,
+                    "total_steps": 1170
+                },
+                "route_id": "RouteScenario_4",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 5,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 23.550000350922346,
+                    "duration_system": 38.062077045440674,
+                    "route_length": 102.00071955609332,
+                    "total_steps": 470
+                },
+                "route_id": "RouteScenario_5",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 6,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 100.35000149533153,
+                    "duration_system": 203.4474036693573,
+                    "route_length": 271.5380032846499,
+                    "total_steps": 2006
+                },
+                "route_id": "RouteScenario_6",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 7,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 105.20000156760216,
+                    "duration_system": 239.70945048332214,
+                    "route_length": 133.0183559770758,
+                    "total_steps": 2103
+                },
+                "route_id": "RouteScenario_7",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 8,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 129.05000192299485,
+                    "duration_system": 209.7921450138092,
+                    "route_length": 157.77996652887876,
+                    "total_steps": 2580
+                },
+                "route_id": "RouteScenario_8",
+                "scores": {
+                    "score_composed": 96.60675022253776,
+                    "score_penalty": 1.0,
+                    "score_route": 96.60675022253776
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 9,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 87.90000130981207,
+                    "duration_system": 202.206928730011,
+                    "route_length": 135.69694936566623,
+                    "total_steps": 1757
+                },
+                "route_id": "RouteScenario_9",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 10,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 157.05000234022737,
+                    "duration_system": 373.62750577926636,
+                    "route_length": 143.9538837823222,
+                    "total_steps": 3140
+                },
+                "route_id": "RouteScenario_10",
+                "scores": {
+                    "score_composed": 97.54514878738564,
+                    "score_penalty": 1.0,
+                    "score_route": 97.54514878738564
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 11,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 69.80000104010105,
+                    "duration_system": 191.3276801109314,
+                    "route_length": 164.0065285395239,
+                    "total_steps": 1395
+                },
+                "route_id": "RouteScenario_11",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 12,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 24.650000367313623,
+                    "duration_system": 43.92281103134155,
+                    "route_length": 117.99957337274866,
+                    "total_steps": 492
+                },
+                "route_id": "RouteScenario_12",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 13,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 173.05000257864594,
+                    "duration_system": 446.39565229415894,
+                    "route_length": 212.18002564417225,
+                    "total_steps": 3460
+                },
+                "route_id": "RouteScenario_13",
+                "scores": {
+                    "score_composed": 88.78674616934191,
+                    "score_penalty": 1.0,
+                    "score_route": 88.78674616934191
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 14,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 60.700000904500484,
+                    "duration_system": 127.30768132209778,
+                    "route_length": 193.99978732058796,
+                    "total_steps": 1213
+                },
+                "route_id": "RouteScenario_14",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 15,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 93.05000138655305,
+                    "duration_system": 242.02737021446228,
+                    "route_length": 164.51078263986236,
+                    "total_steps": 1860
+                },
+                "route_id": "RouteScenario_15",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 16,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 44.85000066831708,
+                    "duration_system": 85.46740078926086,
+                    "route_length": 121.14751090026411,
+                    "total_steps": 896
+                },
+                "route_id": "RouteScenario_16",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 17,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [
+                        "Agent collided against object with type=vehicle.tesla.model3 and id=4695 at (x=88.425, y=198.72, z=0.034)"
+                    ],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 21.050000313669443,
+                    "duration_system": 39.80160641670227,
+                    "route_length": 180.41775547275893,
+                    "total_steps": 420
+                },
+                "route_id": "RouteScenario_17",
+                "scores": {
+                    "score_composed": 11.421072029991807,
+                    "score_penalty": 0.6,
+                    "score_route": 19.035120049986347
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 18,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 74.05000110343099,
+                    "duration_system": 105.5789225101471,
+                    "route_length": 85.10667347104697,
+                    "total_steps": 1480
+                },
+                "route_id": "RouteScenario_18",
+                "scores": {
+                    "score_composed": 97.6643684564911,
+                    "score_penalty": 1.0,
+                    "score_route": 97.6643684564911
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 19,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 49.20000073313713,
+                    "duration_system": 148.79975628852844,
+                    "route_length": 103.77043795573886,
+                    "total_steps": 983
+                },
+                "route_id": "RouteScenario_19",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 20,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 130.80000194907188,
+                    "duration_system": 401.1654567718506,
+                    "route_length": 152.8826160780714,
+                    "total_steps": 2615
+                },
+                "route_id": "RouteScenario_20",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 21,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 47.550000708550215,
+                    "duration_system": 132.8250548839569,
+                    "route_length": 78.96170927065107,
+                    "total_steps": 950
+                },
+                "route_id": "RouteScenario_21",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 22,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 104.45000155642629,
+                    "duration_system": 323.3654272556305,
+                    "route_length": 154.4480699568112,
+                    "total_steps": 2088
+                },
+                "route_id": "RouteScenario_22",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 23,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [
+                        "Agent ran a red light 6408 at (x=341.25, y=69.51, z=0.104)"
+                    ],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 2.8000000417232513,
+                    "duration_system": 4.038543224334717,
+                    "route_length": 182.32783732079824,
+                    "total_steps": 55
+                },
+                "route_id": "RouteScenario_23",
+                "scores": {
+                    "score_composed": 0.0,
+                    "score_penalty": 0.7,
+                    "score_route": 0.0
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 24,
+                "infractions": {
+                    "collisions_layout": [
+                        "Agent collided against object with type=static.static and id=0 at (x=322.203, y=195.183, z=0.033)"
+                    ],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 90.95000135526061,
+                    "duration_system": 233.01774740219116,
+                    "route_length": 198.16448116968033,
+                    "total_steps": 1818
+                },
+                "route_id": "RouteScenario_24",
+                "scores": {
+                    "score_composed": 53.21508223575856,
+                    "score_penalty": 0.65,
+                    "score_route": 81.8693572857824
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 25,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 29.65000044181943,
+                    "duration_system": 64.5045256614685,
+                    "route_length": 102.00283051968749,
+                    "total_steps": 592
+                },
+                "route_id": "RouteScenario_25",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 26,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [
+                        "Agent collided against object with type=vehicle.diamondback.century and id=7511 at (x=92.242, y=43.143, z=0.033)"
+                    ],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 48.15000071749091,
+                    "duration_system": 109.9075767993927,
+                    "route_length": 133.53724058127776,
+                    "total_steps": 962
+                },
+                "route_id": "RouteScenario_26",
+                "scores": {
+                    "score_composed": 31.024951464521617,
+                    "score_penalty": 0.6,
+                    "score_route": 51.708252440869366
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 27,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 72.35000107809901,
+                    "duration_system": 145.29795575141907,
+                    "route_length": 126.76312262857955,
+                    "total_steps": 1446
+                },
+                "route_id": "RouteScenario_27",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 28,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 134.05000199750066,
+                    "duration_system": 277.7210965156555,
+                    "route_length": 202.60033994200163,
+                    "total_steps": 2680
+                },
+                "route_id": "RouteScenario_28",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 29,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [
+                        "Agent collided against object with type=vehicle.tesla.model3 and id=8516 at (x=152.173, y=52.649, z=0.034)"
+                    ],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 19.250000286847353,
+                    "duration_system": 65.95763325691223,
+                    "route_length": 60.94742790288538,
+                    "total_steps": 384
+                },
+                "route_id": "RouteScenario_29",
+                "scores": {
+                    "score_composed": 19.12762767837684,
+                    "score_penalty": 0.6,
+                    "score_route": 31.879379463961403
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 30,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 45.9000006839633,
+                    "duration_system": 123.75211930274963,
+                    "route_length": 76.0718944686348,
+                    "total_steps": 917
+                },
+                "route_id": "RouteScenario_30",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 31,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 41.50000061839819,
+                    "duration_system": 81.48030281066895,
+                    "route_length": 82.16351249858631,
+                    "total_steps": 829
+                },
+                "route_id": "RouteScenario_31",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 32,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 92.60000137984753,
+                    "duration_system": 241.4677345752716,
+                    "route_length": 163.80757257437813,
+                    "total_steps": 1851
+                },
+                "route_id": "RouteScenario_32",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 33,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 75.75000112876296,
+                    "duration_system": 186.4794418811798,
+                    "route_length": 226.17201614491876,
+                    "total_steps": 1514
+                },
+                "route_id": "RouteScenario_33",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 34,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 33.25000049546361,
+                    "duration_system": 75.12395763397217,
+                    "route_length": 101.45507699817132,
+                    "total_steps": 664
+                },
+                "route_id": "RouteScenario_34",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 35,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 81.40000121295452,
+                    "duration_system": 226.41073083877563,
+                    "route_length": 172.89729410732218,
+                    "total_steps": 1627
+                },
+                "route_id": "RouteScenario_35",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 36,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 39.45000058785081,
+                    "duration_system": 95.53077912330627,
+                    "route_length": 76.08716652176399,
+                    "total_steps": 788
+                },
+                "route_id": "RouteScenario_36",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 37,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 91.70000136643648,
+                    "duration_system": 230.32563018798828,
+                    "route_length": 252.81382693515852,
+                    "total_steps": 1833
+                },
+                "route_id": "RouteScenario_37",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 38,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [
+                        "Agent ran a red light 11119 at (x=102.72, y=52.85, z=0.103)"
+                    ],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 2.8000000417232513,
+                    "duration_system": 5.11847710609436,
+                    "route_length": 197.21756615320953,
+                    "total_steps": 55
+                },
+                "route_id": "RouteScenario_38",
+                "scores": {
+                    "score_composed": 0.0,
+                    "score_penalty": 0.7,
+                    "score_route": 0.0
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 39,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [
+                        "Agent collided against object with type=vehicle.kawasaki.ninja and id=11681 at (x=335.657, y=1.727, z=0.033)"
+                    ],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 57.75000086054206,
+                    "duration_system": 108.63546586036682,
+                    "route_length": 234.32842102437536,
+                    "total_steps": 1154
+                },
+                "route_id": "RouteScenario_39",
+                "scores": {
+                    "score_composed": 43.93554314345399,
+                    "score_penalty": 0.6,
+                    "score_route": 73.22590523908998
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 40,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 206.05000307038426,
+                    "duration_system": 406.09111309051514,
+                    "route_length": 61.708499300212765,
+                    "total_steps": 4120
+                },
+                "route_id": "RouteScenario_40",
+                "scores": {
+                    "score_composed": 42.07130518601944,
+                    "score_penalty": 1.0,
+                    "score_route": 42.07130518601944
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 41,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 60.950000908225775,
+                    "duration_system": 114.97729539871216,
+                    "route_length": 176.6345238647999,
+                    "total_steps": 1218
+                },
+                "route_id": "RouteScenario_41",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 42,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 81.40000121295452,
+                    "duration_system": 246.86886405944824,
+                    "route_length": 182.69144094719363,
+                    "total_steps": 1627
+                },
+                "route_id": "RouteScenario_42",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 43,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [
+                        "Agent ran a red light 12732 at (x=341.25, y=69.51, z=0.104)"
+                    ],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 2.8000000417232513,
+                    "duration_system": 3.886728525161743,
+                    "route_length": 112.43569666015188,
+                    "total_steps": 55
+                },
+                "route_id": "RouteScenario_43",
+                "scores": {
+                    "score_composed": 0.0,
+                    "score_penalty": 0.7,
+                    "score_route": 0.0
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 44,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 48.300000719726086,
+                    "duration_system": 86.88648080825806,
+                    "route_length": 128.84242966428855,
+                    "total_steps": 965
+                },
+                "route_id": "RouteScenario_44",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 45,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 20.500000305473804,
+                    "duration_system": 29.035277128219604,
+                    "route_length": 99.99429731312964,
+                    "total_steps": 409
+                },
+                "route_id": "RouteScenario_45",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 46,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 178.05000265315175,
+                    "duration_system": 491.2525825500488,
+                    "route_length": 127.75770437803102,
+                    "total_steps": 3560
+                },
+                "route_id": "RouteScenario_46",
+                "scores": {
+                    "score_composed": 34.80139222446152,
+                    "score_penalty": 1.0,
+                    "score_route": 34.80139222446152
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 47,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 90.8500013537705,
+                    "duration_system": 278.9568440914154,
+                    "route_length": 193.05267215798742,
+                    "total_steps": 1816
+                },
+                "route_id": "RouteScenario_47",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 48,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 82.05000122264028,
+                    "duration_system": 196.11285090446472,
+                    "route_length": 61.04120077097456,
+                    "total_steps": 1640
+                },
+                "route_id": "RouteScenario_48",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 49,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 42.900000639259815,
+                    "duration_system": 104.48651099205017,
+                    "route_length": 119.33877544656478,
+                    "total_steps": 857
+                },
+                "route_id": "RouteScenario_49",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 50,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 83.05000123754144,
+                    "duration_system": 130.33232522010803,
+                    "route_length": 74.45448153968249,
+                    "total_steps": 1660
+                },
+                "route_id": "RouteScenario_50",
+                "scores": {
+                    "score_composed": 94.2805812692041,
+                    "score_penalty": 1.0,
+                    "score_route": 94.2805812692041
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 51,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 121.20000180602074,
+                    "duration_system": 299.60654616355896,
+                    "route_length": 76.04630035462903,
+                    "total_steps": 2423
+                },
+                "route_id": "RouteScenario_51",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 52,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 62.05000092461705,
+                    "duration_system": 148.91292786598206,
+                    "route_length": 88.79024552200113,
+                    "total_steps": 1240
+                },
+                "route_id": "RouteScenario_52",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 53,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 94.45000140741467,
+                    "duration_system": 211.32462191581726,
+                    "route_length": 164.1800250911855,
+                    "total_steps": 1888
+                },
+                "route_id": "RouteScenario_53",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 54,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 47.65000071004033,
+                    "duration_system": 96.20859289169312,
+                    "route_length": 147.0530459543332,
+                    "total_steps": 952
+                },
+                "route_id": "RouteScenario_54",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 55,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 75.05000111833215,
+                    "duration_system": 180.0201723575592,
+                    "route_length": 87.50997995203181,
+                    "total_steps": 1500
+                },
+                "route_id": "RouteScenario_55",
+                "scores": {
+                    "score_composed": 69.5170765933358,
+                    "score_penalty": 1.0,
+                    "score_route": 69.5170765933358
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 56,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [
+                        "Agent collided against object with type=vehicle.diamondback.century and id=16958 at (x=359.348, y=2.038, z=0.033)"
+                    ],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 81.65000121667981,
+                    "duration_system": 146.63836145401,
+                    "route_length": 214.06472683155013,
+                    "total_steps": 1632
+                },
+                "route_id": "RouteScenario_56",
+                "scores": {
+                    "score_composed": 49.03226099077633,
+                    "score_penalty": 0.6,
+                    "score_route": 81.72043498462722
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 57,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 70.7000010535121,
+                    "duration_system": 139.31511759757996,
+                    "route_length": 157.17934495986603,
+                    "total_steps": 1413
+                },
+                "route_id": "RouteScenario_57",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 58,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 125.05000186339021,
+                    "duration_system": 244.3278889656067,
+                    "route_length": 61.65680927033094,
+                    "total_steps": 2500
+                },
+                "route_id": "RouteScenario_58",
+                "scores": {
+                    "score_composed": 96.08545536779975,
+                    "score_penalty": 1.0,
+                    "score_route": 96.08545536779975
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 59,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 75.65000112727284,
+                    "duration_system": 195.3667733669281,
+                    "route_length": 75.6435151765849,
+                    "total_steps": 1512
+                },
+                "route_id": "RouteScenario_59",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 60,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 128.55000191554427,
+                    "duration_system": 242.18572545051575,
+                    "route_length": 121.95086895221006,
+                    "total_steps": 2570
+                },
+                "route_id": "RouteScenario_60",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 61,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 105.05000156536698,
+                    "duration_system": 212.16200065612793,
+                    "route_length": 71.65617033309495,
+                    "total_steps": 2100
+                },
+                "route_id": "RouteScenario_61",
+                "scores": {
+                    "score_composed": 97.61614413875074,
+                    "score_penalty": 1.0,
+                    "score_route": 97.61614413875074
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 62,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 36.40000054240227,
+                    "duration_system": 67.08619117736816,
+                    "route_length": 114.9405927863015,
+                    "total_steps": 727
+                },
+                "route_id": "RouteScenario_62",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 63,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [
+                        "Agent collided against object with type=vehicle.mustang.mustang and id=19231 at (x=331.258, y=134.949, z=0.034)"
+                    ],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 15.000000223517418,
+                    "duration_system": 23.246688842773438,
+                    "route_length": 146.22199072671853,
+                    "total_steps": 299
+                },
+                "route_id": "RouteScenario_63",
+                "scores": {
+                    "score_composed": 13.560212810754527,
+                    "score_penalty": 0.6,
+                    "score_route": 22.60035468459088
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 64,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 118.05000175908208,
+                    "duration_system": 236.04453372955322,
+                    "route_length": 194.260748114952,
+                    "total_steps": 2360
+                },
+                "route_id": "RouteScenario_64",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 65,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 223.050003323704,
+                    "duration_system": 624.5650024414062,
+                    "route_length": 231.4903992415354,
+                    "total_steps": 4460
+                },
+                "route_id": "RouteScenario_65",
+                "scores": {
+                    "score_composed": 83.89645419615967,
+                    "score_penalty": 1.0,
+                    "score_route": 83.89645419615967
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 66,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 46.35000069066882,
+                    "duration_system": 129.43127298355103,
+                    "route_length": 116.66619078117633,
+                    "total_steps": 926
+                },
+                "route_id": "RouteScenario_66",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 67,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 44.65000066533685,
+                    "duration_system": 79.45229411125183,
+                    "route_length": 137.4297357099375,
+                    "total_steps": 892
+                },
+                "route_id": "RouteScenario_67",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 68,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [
+                        "Agent ran a red light 20565 at (x=321.76, y=62.44, z=0.103)"
+                    ],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 0.05000000074505806,
+                    "duration_system": 0.3082919120788574,
+                    "route_length": 136.0397714963023,
+                    "total_steps": 0
+                },
+                "route_id": "RouteScenario_68",
+                "scores": {
+                    "score_composed": 0.0,
+                    "score_penalty": 0.7,
+                    "score_route": 0.0
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 69,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 78.40000116825104,
+                    "duration_system": 231.94178080558777,
+                    "route_length": 125.36507826680788,
+                    "total_steps": 1567
+                },
+                "route_id": "RouteScenario_69",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 70,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 91.65000136569142,
+                    "duration_system": 189.12106680870056,
+                    "route_length": 177.35469455794438,
+                    "total_steps": 1832
+                },
+                "route_id": "RouteScenario_70",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 71,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 70.50000105053186,
+                    "duration_system": 106.26114153862,
+                    "route_length": 152.81611805439005,
+                    "total_steps": 1409
+                },
+                "route_id": "RouteScenario_71",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 72,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 85.05000126734376,
+                    "duration_system": 214.33675694465637,
+                    "route_length": 180.15198244611574,
+                    "total_steps": 1700
+                },
+                "route_id": "RouteScenario_72",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 73,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [
+                        "Agent collided against object with type=vehicle.citroen.c3 and id=22334 at (x=92.283, y=62.004, z=0.035)"
+                    ],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 76.95000114664435,
+                    "duration_system": 196.14676022529602,
+                    "route_length": 213.3823861776042,
+                    "total_steps": 1538
+                },
+                "route_id": "RouteScenario_73",
+                "scores": {
+                    "score_composed": 41.07230719270548,
+                    "score_penalty": 0.6,
+                    "score_route": 68.4538453211758
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 74,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 114.05000169947743,
+                    "duration_system": 179.77861166000366,
+                    "route_length": 129.7878783161108,
+                    "total_steps": 2280
+                },
+                "route_id": "RouteScenario_74",
+                "scores": {
+                    "score_composed": 97.69350556966873,
+                    "score_penalty": 1.0,
+                    "score_route": 97.69350556966873
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 75,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [
+                        "Agent collided against object with type=vehicle.nissan.patrol and id=23000 at (x=94.76, y=323.37, z=0.034)"
+                    ],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 36.85000054910779,
+                    "duration_system": 76.97302174568176,
+                    "route_length": 175.24642638931437,
+                    "total_steps": 736
+                },
+                "route_id": "RouteScenario_75",
+                "scores": {
+                    "score_composed": 28.570122869547333,
+                    "score_penalty": 0.6,
+                    "score_route": 47.61687144924556
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 76,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 137.30000204592943,
+                    "duration_system": 417.38892102241516,
+                    "route_length": 183.05943138285798,
+                    "total_steps": 2745
+                },
+                "route_id": "RouteScenario_76",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 77,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 101.40000151097775,
+                    "duration_system": 253.3082799911499,
+                    "route_length": 198.0105428399668,
+                    "total_steps": 2027
+                },
+                "route_id": "RouteScenario_77",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 78,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 59.650000888854265,
+                    "duration_system": 118.90942025184631,
+                    "route_length": 54.188690868624185,
+                    "total_steps": 1192
+                },
+                "route_id": "RouteScenario_78",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 79,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 108.70000161975622,
+                    "duration_system": 279.4703435897827,
+                    "route_length": 74.30253002706992,
+                    "total_steps": 2173
+                },
+                "route_id": "RouteScenario_79",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 80,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 124.30000185221434,
+                    "duration_system": 188.86764430999756,
+                    "route_length": 174.099335315202,
+                    "total_steps": 2485
+                },
+                "route_id": "RouteScenario_80",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 81,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 42.60000063478947,
+                    "duration_system": 111.25701880455017,
+                    "route_length": 69.15404953405235,
+                    "total_steps": 851
+                },
+                "route_id": "RouteScenario_81",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 82,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [
+                        "Agent collided against object with type=vehicle.carlamotors.carlacola and id=25164 at (x=92.376, y=203.691, z=0.033)"
+                    ],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 15.050000224262476,
+                    "duration_system": 34.59720969200134,
+                    "route_length": 199.846986840203,
+                    "total_steps": 300
+                },
+                "route_id": "RouteScenario_82",
+                "scores": {
+                    "score_composed": 4.102234322460425,
+                    "score_penalty": 0.6,
+                    "score_route": 6.8370572041007085
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 83,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 45.500000678002834,
+                    "duration_system": 118.5789692401886,
+                    "route_length": 73.65456914966026,
+                    "total_steps": 909
+                },
+                "route_id": "RouteScenario_83",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 84,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [
+                        "Agent collided against object with type=walker.pedestrian.0023 and id=25761 at (x=127.969, y=59.472, z=0.033)"
+                    ],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 81.80000121891499,
+                    "duration_system": 181.01385402679443,
+                    "route_length": 185.53717924964667,
+                    "total_steps": 1635
+                },
+                "route_id": "RouteScenario_84",
+                "scores": {
+                    "score_composed": 35.423401013799676,
+                    "score_penalty": 0.5,
+                    "score_route": 70.84680202759935
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 85,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [
+                        "Agent ran a red light 25912 at (x=341.36, y=12.71, z=0.103)"
+                    ],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 0.05000000074505806,
+                    "duration_system": 0.19748854637145996,
+                    "route_length": 182.59784425318242,
+                    "total_steps": 0
+                },
+                "route_id": "RouteScenario_85",
+                "scores": {
+                    "score_composed": 0.0,
+                    "score_penalty": 0.7,
+                    "score_route": 0
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 86,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": [
+                        "Agent got blocked at (x=92.309, y=201.771, z=0.033)"
+                    ]
+                },
+                "meta": {
+                    "duration_game": 194.75000290200114,
+                    "duration_system": 536.1735382080078,
+                    "route_length": 225.89203209146964,
+                    "total_steps": 3894
+                },
+                "route_id": "RouteScenario_86",
+                "scores": {
+                    "score_composed": 8.387681458486373,
+                    "score_penalty": 1.0,
+                    "score_route": 8.387681458486373
+                },
+                "status": "Failed - Agent got blocked"
+            },
+            {
+                "index": 87,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 72.45000107958913,
+                    "duration_system": 167.82935237884521,
+                    "route_length": 144.06328596527803,
+                    "total_steps": 1448
+                },
+                "route_id": "RouteScenario_87",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 88,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [
+                        "Agent collided against object with type=vehicle.volkswagen.t2 and id=27146 at (x=96.006, y=128.128, z=0.034)"
+                    ],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 21.65000032261014,
+                    "duration_system": 42.806373834609985,
+                    "route_length": 70.5985254250455,
+                    "total_steps": 432
+                },
+                "route_id": "RouteScenario_88",
+                "scores": {
+                    "score_composed": 17.848692155734895,
+                    "score_penalty": 0.6,
+                    "score_route": 29.747820259558157
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 89,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 242.05000360682607,
+                    "duration_system": 508.6539354324341,
+                    "route_length": 219.5811944174661,
+                    "total_steps": 4840
+                },
+                "route_id": "RouteScenario_89",
+                "scores": {
+                    "score_composed": 98.54488888915043,
+                    "score_penalty": 1.0,
+                    "score_route": 98.54488888915043
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 90,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 106.85000159218907,
+                    "duration_system": 202.29443192481995,
+                    "route_length": 225.58165172360304,
+                    "total_steps": 2136
+                },
+                "route_id": "RouteScenario_90",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 91,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [
+                        "Agent ran a red light 27805 at (x=102.72, y=126.82, z=0.103)"
+                    ],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 0.05000000074505806,
+                    "duration_system": 0.18053984642028809,
+                    "route_length": 166.281961391051,
+                    "total_steps": 0
+                },
+                "route_id": "RouteScenario_91",
+                "scores": {
+                    "score_composed": 0.0,
+                    "score_penalty": 0.7,
+                    "score_route": 0.0
+                },
+                "status": "Failed"
+            },
+            {
+                "index": 92,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 67.20000100135803,
+                    "duration_system": 106.55369806289673,
+                    "route_length": 126.50902586130663,
+                    "total_steps": 1343
+                },
+                "route_id": "RouteScenario_92",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 93,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 203.05000302568078,
+                    "duration_system": 474.22795844078064,
+                    "route_length": 151.4169404570082,
+                    "total_steps": 4060
+                },
+                "route_id": "RouteScenario_93",
+                "scores": {
+                    "score_composed": 90.98974961182262,
+                    "score_penalty": 1.0,
+                    "score_route": 90.98974961182262
+                },
+                "status": "Failed - Agent timed out"
+            },
+            {
+                "index": 94,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 83.00000123679638,
+                    "duration_system": 168.52019882202148,
+                    "route_length": 224.23579879965442,
+                    "total_steps": 1659
+                },
+                "route_id": "RouteScenario_94",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 95,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 43.00000064074993,
+                    "duration_system": 81.34872698783875,
+                    "route_length": 119.90189196948249,
+                    "total_steps": 859
+                },
+                "route_id": "RouteScenario_95",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 96,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 20.35000030323863,
+                    "duration_system": 31.01509165763855,
+                    "route_length": 99.99636821949844,
+                    "total_steps": 406
+                },
+                "route_id": "RouteScenario_96",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 97,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 48.70000072568655,
+                    "duration_system": 99.25014138221741,
+                    "route_length": 122.55994624392775,
+                    "total_steps": 973
+                },
+                "route_id": "RouteScenario_97",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 98,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 42.95000064000487,
+                    "duration_system": 69.61349868774414,
+                    "route_length": 140.2172816081466,
+                    "total_steps": 858
+                },
+                "route_id": "RouteScenario_98",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 99,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 71.90000107139349,
+                    "duration_system": 121.26123976707458,
+                    "route_length": 174.76432767105365,
+                    "total_steps": 1437
+                },
+                "route_id": "RouteScenario_99",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            }
+        ]
+    },
+    "eligible": true,
+    "entry_status": "Finished with agent errors",
+    "labels": [
+        "Avg. driving score",
+        "Avg. route completion",
+        "Avg. infraction penalty",
+        "Collisions with pedestrians",
+        "Collisions with vehicles",
+        "Collisions with layout",
+        "Red lights infractions",
+        "Stop sign infractions",
+        "Off-road infractions",
+        "Route deviations",
+        "Route timeouts",
+        "Agent blocked"
+    ],
+    "sensors": [
+        "carla_camera",
+        "carla_imu",
+        "carla_gnss",
+        "carla_speedometer"
+    ],
+    "values": [
+        "81.803",
+        "84.175",
+        "0.934",
+        "0.076",
+        "2.765",
+        "0.062",
+        "6000.000",
+        "0.000",
+        "0.000",
+        "0.000",
+        "1.788",
+        "0.528"
+    ]
+}
