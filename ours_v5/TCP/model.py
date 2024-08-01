@@ -57,6 +57,15 @@ class TCP(nn.Module):
 							nn.ReLU(inplace=True),
 						)
 
+		self.imitation_head = nn.Sequential(
+								nn.Linear(1000+256, 512),
+								nn.ReLU(inplace=True),
+								nn.Linear(512, 512),
+								nn.ReLU(inplace=True),
+								nn.Linear(512, 256),
+								nn.ReLU(inplace=True)
+							)
+
 		# self.join_ctrl = nn.Sequential(
 		# 					nn.Linear(128+512, 512),
 		# 					nn.ReLU(inplace=True),
@@ -94,8 +103,16 @@ class TCP(nn.Module):
 		# shared branches_neurons
 		dim_out = 2
 
-		self.policy_head = nn.Sequential(
+		self.policy_head_branch_imitation = nn.Sequential(
 				nn.Linear(256, 256),
+				nn.ReLU(inplace=True),
+				nn.Linear(256, 256),
+				nn.Dropout2d(p=0.5),
+				nn.ReLU(inplace=True),
+			)
+		
+		self.policy_head_branch_ctrl = nn.Sequential(
+				nn.Linear(512, 256),
 				nn.ReLU(inplace=True),
 				nn.Linear(256, 256),
 				nn.Dropout2d(p=0.5),
@@ -153,6 +170,7 @@ class TCP(nn.Module):
 
 
 	def forward(self, img, state, target_point):
+		'''trajectory and control branch'''
 		feature_emb, cnn_feature = self.perception(img)
 		outputs = {}
 		outputs['pred_speed'] = self.speed_branch(feature_emb)
@@ -202,14 +220,9 @@ class TCP(nn.Module):
 		out = self.transformer_decoder(tgt, memory_256)		# output dim: tgt
 
 		out = torch.flatten(out, 1)	# (256*5, 1)
+
 		j_ctrl_final = self.decrease_dim(out)
-
 		outputs['pred_value_ctrl'] = self.value_branch_ctrl(j_ctrl_final)
-
-		outputs['pred_features_ctrl'] = j_ctrl_final
-		policy = self.policy_head(j_ctrl_final)
-		outputs['mu_branches'] = self.dist_mu(policy)
-		outputs['sigma_branches'] = self.dist_sigma(policy)
 
 		# x = j_ctrl
 		# mu = outputs['mu_branches']
@@ -239,6 +252,18 @@ class TCP(nn.Module):
 		# outputs['future_feature'] = future_feature
 		# outputs['future_mu'] = future_mu
 		# outputs['future_sigma'] = future_sigma
+
+		'''imitation branch'''
+		imitation_feature = self.imitation_head(torch.cat([feature_emb, measurement_feature], dim=1))
+		j_imitation = self.policy_head_branch_imitation(imitation_feature)
+		outputs['imitation_feature'] = j_imitation
+		outputs['pred_features_ctrl'] = j_imitation
+
+		'''combine'''
+		policy = self.policy_head_branch_ctrl(torch.cat([j_imitation, j_ctrl_final], dim=1))
+		outputs['mu_branches'] = self.dist_mu(policy)
+		outputs['sigma_branches'] = self.dist_sigma(policy)
+
 		return outputs
 
 	def process_action(self, pred, command, speed, target_point):

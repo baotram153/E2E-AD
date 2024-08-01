@@ -252,8 +252,8 @@ class TCP(nn.Module):
 			x = dx + x
 			output_wp.append(x)
 
-		pred_wp = torch.stack(output_wp, dim=1)
-		outputs['pred_wp'] = pred_wp
+		pred_init_wp = torch.stack(output_wp, dim=1)
+		outputs['pred_init_wp'] = pred_init_wp
 
 		traj_hidden_states = torch.stack(traj_hidden_state, dim=1)
 
@@ -305,6 +305,16 @@ class TCP(nn.Module):
 		query_res_block4 = self.transformer_decoder_block4(query_embed_block4, cnn_features_block4)
 
 		query_block4_refined = self.refine_query(query_res_block4, cnn_emb_block4)
+
+		traj_queries = query_block4_refined[:, 1:, :]
+		output_wp = []
+		for wp in range(self.config.pred_len):
+			dx = self.output_traj(traj_queries[:, wp, :].squeeze(dim=1))
+			x = dx + x
+			output_wp.append(x)
+
+		pred_final_wp = torch.stack(output_wp, dim=1)
+		outputs['pred_final_wp'] = pred_final_wp
 
 		query_flatten = torch.flatten(query_block4_refined, 1)			# (256*5, 1)
 		j_ctrl_final = self.ctrl_head(query_flatten)

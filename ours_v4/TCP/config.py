@@ -70,7 +70,8 @@ class GlobalConfig:
 	value_weight = 0.001
 	features_weight = 0.01
 	init_wp_weight = 0.1
-	final_wp_weight = 0.5
+	final_wp_weight = 1
+	final_action_weight = 1
 	
 	rl_ckpt = "roach/log/ckpt_11833344.pth"
 

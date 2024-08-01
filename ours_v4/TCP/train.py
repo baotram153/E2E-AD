@@ -62,7 +62,7 @@ class TCP_planner(pl.LightningModule):
 		dist_sup = Beta(batch['action_mu'], batch['action_sigma'])
 		dist_pred = Beta(pred['mu_branches'], pred['sigma_branches'])
 		kl_div = torch.distributions.kl_divergence(dist_sup, dist_pred)
-		action_loss = torch.mean(kl_div[:, 0]) + torch.mean(kl_div[:, 1])
+		action_loss = (torch.mean(kl_div[:, 0])*0.5 + torch.mean(kl_div[:, 1])*0.5)*self.config.final_action_weight
 		speed_loss = F.l1_loss(pred['pred_speed'], speed) * self.config.speed_weight
 		value_loss = (F.mse_loss(pred['pred_value_traj'], value) + F.mse_loss(pred['pred_value_ctrl'], value)) * self.config.value_weight
 		feature_loss = (F.mse_loss(pred['pred_features_traj'], feature) +F.mse_loss(pred['pred_features_ctrl'], feature))* self.config.features_weight
@@ -77,11 +77,14 @@ class TCP_planner(pl.LightningModule):
 		# 	future_feature_loss += F.mse_loss(pred['future_feature'][i], batch['future_feature'][i]) * self.config.features_weight
 		# future_feature_loss /= self.config.pred_len
 		# future_action_loss /= self.config.pred_len
-		wp_loss = F.l1_loss(pred['pred_wp'], gt_waypoints, reduction='none').mean()*self.config.init_wp_weight
-		loss = action_loss + speed_loss + value_loss + feature_loss + wp_loss
+
+		init_wp_loss = F.l1_loss(pred['pred_final_wp'], gt_waypoints, reduction='none').mean()*self.config.init_wp_weight
+		final_wp_loss = F.l1_loss(pred['pred_final_wp'], gt_waypoints, reduction='none').mean()*self.config.final_wp_weight
+		loss = action_loss + speed_loss + value_loss + feature_loss + init_wp_loss + final_wp_loss
 
 		self.log('train_action_loss', action_loss.item())
-		self.log('train_wp_loss_loss', wp_loss.item())
+		self.log('train_init_wp_loss', init_wp_loss.item())
+		self.log('train_final_wp_loss', final_wp_loss.item())
 		self.log('train_speed_loss', speed_loss.item())
 		self.log('train_value_loss', value_loss.item())
 		self.log('train_feature_loss', feature_loss.item())
@@ -113,7 +116,7 @@ class TCP_planner(pl.LightningModule):
 		speed_loss = F.l1_loss(pred['pred_speed'], speed) * self.config.speed_weight
 		value_loss = (F.mse_loss(pred['pred_value_traj'], value) + F.mse_loss(pred['pred_value_ctrl'], value)) * self.config.value_weight
 		feature_loss = (F.mse_loss(pred['pred_features_traj'], feature) +F.mse_loss(pred['pred_features_ctrl'], feature))* self.config.features_weight
-		wp_loss = F.l1_loss(pred['pred_wp'], gt_waypoints, reduction='none').mean()
+		wp_loss = F.l1_loss(pred['pred_final_wp'], gt_waypoints, reduction='none').mean()
 
 		B = batch['action_mu'].shape[0]
 		batch_steer_l1 = 0 

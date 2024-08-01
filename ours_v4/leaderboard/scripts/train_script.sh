@@ -5,4 +5,4 @@ python TCP/train.py --gpus 1 \
     --batch_size 32 \
     --epochs 60 \
     --logdir "/workspace/log/TCP/chkpt/ours_v4" \
-    --id "debug"
+    --id "change_loss"
