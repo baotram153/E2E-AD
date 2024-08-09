@@ -4,7 +4,10 @@ import torch
 from torch import nn
 from TCP.resnet import *
 from TCP.transformer import *
-from TCP.RAFT.core import raft
+
+from demo import viz
+import raft
+from utils.utils import InputPadder
 
 
 class PIDController(object):
@@ -42,10 +45,31 @@ class TCP(nn.Module):
 
 		self.perception = resnet34(pretrained=True)
 
-		self.flow_backbone = raft.RAFT(self.config)
+		self.flow_backbone = torch.nn.DataParallel(raft.RAFT(self.config))
 		self.flow_backbone.load_state_dict(torch.load(self.config.model))
+
+		self.flow_backbone = self.flow_backbone.module
 		self.flow_backbone.cuda()
 		self.flow_backbone.eval()
+
+		self.flow_cnn_decoder = nn.Sequential(nn.Conv2d(in_channels=2, out_channels=16, kernel_size=3, stride=2, padding=1),
+                      nn.MaxPool2d(kernel_size=3,  stride=2, padding=1),
+                      nn.ReLU(inplace=True),
+                      nn.BatchNorm2d(num_features=16),
+                      nn.Conv2d(in_channels=16, out_channels=64, kernel_size=3, stride=2, padding=1),
+                      nn.BatchNorm2d(num_features=64),
+                      nn.Conv2d(in_channels=64, out_channels=512, kernel_size=3, stride=2, padding=1),
+                      nn.BatchNorm2d(num_features=512),
+					  nn.AdaptiveAvgPool2d((1, 1)))
+		
+		self.flow_mlp_decoder = nn.Sequential(nn.Linear(512, 256),
+							nn.ReLU(inplace=True),
+							nn.Linear(256, 256),
+							nn.ReLU(inplace=True),
+						)
+
+		for param in self.flow_backbone.parameters():
+			param.requires_grad = False
 
 		self.measurements = nn.Sequential(	
 							nn.Linear(1+2+6, 256),
@@ -55,7 +79,7 @@ class TCP(nn.Module):
 						)
 
 		self.join_traj = nn.Sequential(
-							nn.Linear(256+1000, 512),
+							nn.Linear(256+256+1000, 512),
 							nn.ReLU(inplace=True),
 							nn.Linear(512, 512),
 							nn.ReLU(inplace=True),
@@ -73,7 +97,7 @@ class TCP(nn.Module):
 		# 				)
 
 		self.speed_branch = nn.Sequential(
-							nn.Linear(1000, 256),
+							nn.Linear(1000+256, 256),
 							nn.ReLU(inplace=True),
 							nn.Linear(256, 256),
 							nn.Dropout2d(p=0.5),
@@ -159,13 +183,33 @@ class TCP(nn.Module):
 
 
 
-	def forward(self, img, state, target_point):
+	def forward(self, img, img_seq, state, target_point):
+		# print(img_seq[0])
+		img1 = img_seq[:, 0, :, :].permute(0, 3, 1, 2).float()
+		img2 = img_seq[:, 1, :, :].permute(0, 3, 1, 2).float()
+
+		padder = InputPadder(img1.shape)
+		img1, img2 = padder.pad(img1, img2)
+
+		flow_low, flow_up = self.flow_backbone(img1, img2, iters=20, test_mode=True)
+
+		# for i in range(img.shape[0]):
+		# 	print(flow_up.shape, img1.shape)
+		# 	viz(img1, flow_up, i)
+		# 	exit()
+
+		flow_cnn_feature = self.flow_cnn_decoder(flow_up)
+		flow_feature_flatten = torch.flatten(flow_cnn_feature, start_dim=1)
+		flow_feature_emb = self.flow_mlp_decoder(flow_feature_flatten)
+
 		feature_emb, cnn_feature = self.perception(img)
+
+		perception_feature = torch.cat([feature_emb, flow_feature_emb], 1)
 		outputs = {}
-		outputs['pred_speed'] = self.speed_branch(feature_emb)
+		outputs['pred_speed'] = self.speed_branch(perception_feature)
 		measurement_feature = self.measurements(state)
 		
-		j_traj = self.join_traj(torch.cat([feature_emb, measurement_feature], 1))
+		j_traj = self.join_traj(torch.cat([perception_feature, measurement_feature], 1))
 		outputs['pred_value_traj'] = self.value_branch_traj(j_traj)
 		outputs['pred_features_traj'] = j_traj
 		z = j_traj
@@ -242,7 +286,6 @@ class TCP(nn.Module):
 		# 	future_feature.append(x)
 		# 	future_mu.append(mu)
 		# 	future_sigma.append(sigma)
-
 
 		# outputs['future_feature'] = future_feature
 		# outputs['future_mu'] = future_mu

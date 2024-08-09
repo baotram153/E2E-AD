@@ -47,6 +47,7 @@ class TCP_planner(pl.LightningModule):
 
 	def training_step(self, batch, batch_idx):
 		front_img = batch['front_img']
+		front_img_seq = batch['front_img_seq']
 		speed = batch['speed'].to(dtype=torch.float32).view(-1,1) / 12.
 		target_point = batch['target_point'].to(dtype=torch.float32)
 		command = batch['target_command']
@@ -57,7 +58,7 @@ class TCP_planner(pl.LightningModule):
 
 		gt_waypoints = batch['waypoints']
 
-		pred = self.model(front_img, state, target_point)
+		pred = self.model(front_img, front_img_seq, state, target_point)
 
 		dist_sup = Beta(batch['action_mu'], batch['action_sigma'])
 		dist_pred = Beta(pred['mu_branches'], pred['sigma_branches'])
@@ -98,6 +99,8 @@ class TCP_planner(pl.LightningModule):
 
 	def validation_step(self, batch, batch_idx):
 		front_img = batch['front_img']
+		front_img_seq = batch['front_img_seq']
+
 		speed = batch['speed'].to(dtype=torch.float32).view(-1,1) / 12.
 		target_point = batch['target_point'].to(dtype=torch.float32)
 		command = batch['target_command']
@@ -106,7 +109,7 @@ class TCP_planner(pl.LightningModule):
 		feature = batch['feature']
 		gt_waypoints = batch['waypoints']
 
-		pred = self.model(front_img, state, target_point)
+		pred = self.model(front_img, front_img_seq, state, target_point)
 		dist_sup = Beta(batch['action_mu'], batch['action_sigma'])
 		dist_pred = Beta(pred['mu_branches'], pred['sigma_branches'])
 		kl_div = torch.distributions.kl_divergence(dist_sup, dist_pred)

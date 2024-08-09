@@ -5,7 +5,7 @@ from torch import nn
 from TCP.resnet import *
 from TCP.transformer import *
 
-from transformer import PositionalEncoding
+from TCP.transformer import PositionalEncoding
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -32,10 +32,6 @@ class PIDController(object):
 			derivative = 0.0
 
 		return self._K_P * error + self._K_I * integral + self._K_D * derivative
-		
-
-	
-	
 	# def block_forward
 
 	

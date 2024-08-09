@@ -203,7 +203,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 
 		throttle_ctrl, brake_ctrl, steer_ctrl, metadata_ctrl = self.net.process_action(pred, tick_data['next_command'], gt_velocity, target_point)
 
-		throttle_traj, brake_traj, steer_traj, metadata_traj = self.net.control_pid(pred['pred_wp'], gt_velocity, target_point)
+		throttle_traj, brake_traj, steer_traj, metadata_traj = self.net.control_pid(pred['pred_final_wp'], gt_velocity, target_point)
 		if brake_traj < 0.05: brake_traj = 0.0
 		if throttle_traj > brake_traj: brake_traj = 0.0
 

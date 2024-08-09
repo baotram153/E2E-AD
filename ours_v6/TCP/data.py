@@ -14,7 +14,10 @@ class CARLA_Data(Dataset):
 		self.img_aug = img_aug
 		self._batch_read_number = 0
 
+		# self.front_img_processed = []
 		self.front_img = []
+		# self.front_img_past = []
+
 		self.x = []
 		self.y = []
 		self.command = []
@@ -55,6 +58,7 @@ class CARLA_Data(Dataset):
 
 			# input current position, rgb img, heading, speed
 			self.front_img += data['front_img']
+			# self.front_img_past += [data['front_img'][0]] + data['front_img'][:-1]
 			self.x += data['input_x']
 			self.y += data['input_y']
 			self.theta += data['input_theta']
@@ -88,7 +92,14 @@ class CARLA_Data(Dataset):
 	def __getitem__(self, index):
 		"""Returns the item at index idx. """
 		data = dict()
+
 		data['front_img'] = self.front_img[index]
+
+		# print(f"front_img: {self.front_img[index]}")
+		# print(f"front_img: {self.front_img[index+1]}")
+		# print(len(self.front_img[index]))
+
+		# data['front_img_past'] = self.front_img_past[index]
 
 		if self.img_aug:
 			data['front_img'] = self._im_transform(augmenter(self._batch_read_number).augment_image(np.array(
@@ -96,8 +107,19 @@ class CARLA_Data(Dataset):
 		else:
 			data['front_img'] = self._im_transform(np.array(
 					Image.open(self.root+self.front_img[index][0])))
+			
+		data['front_img_seq'] = []
+		for img in self.front_img[index]:
+			data['front_img_seq'].append(np.array(Image.open(self.root + img)))
+		
+		data['front_img_seq'] = np.array(data['front_img_seq'])
 
 		# fix for theta=nan in some measurements
+		# print(f"theta: {self.theta[index]}")
+		# print(f"x: {self.x[index]}")
+		# print(f"y: {self.y[index]}")
+		# exit()
+
 		if np.isnan(self.theta[index][0]):
 			self.theta[index][0] = 0.
 
@@ -111,7 +133,7 @@ class CARLA_Data(Dataset):
 			[np.cos(np.pi/2+ego_theta), -np.sin(np.pi/2+ego_theta)],
 			[np.sin(np.pi/2+ego_theta),  np.cos(np.pi/2+ego_theta)]
 			])
-			local_command_point = np.array([self.future_y[index][i]-ego_y, self.future_x[index][i]-ego_x] )
+			local_command_point = np.array([self.future_y[index][i]-ego_y, self.future_x[index][i]-ego_x])
 			local_command_point = R.T.dot(local_command_point)
 			waypoints.append(local_command_point)
 
@@ -272,6 +294,3 @@ def get_action_beta(alpha, beta):
 		x = x * 2 - 1
 
 		return x
-
-
-	

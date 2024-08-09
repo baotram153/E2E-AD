@@ -3,9 +3,11 @@ import os
 class GlobalConfig:
 	""" base architecture configurations """
 	# RAFT for optical flow
-	model = "models/raft-things.pth"
+	model = "TCP/RAFT/models/raft-things.pth"
 	small = False
 	mixed_precision = True
+	dropout = 0.
+	alternate_corr = False
 
 	# evaluate options
 	draw_wps = False
@@ -15,7 +17,7 @@ class GlobalConfig:
 	pred_len = 4 # future waypoints predicted
 
 	# data root
-	root_dir_all = "/workspace/datasets/CARLA-data"
+	root_dir_all = "/workspace/datasets/CARLA-data/"
 	data_dir_pattern = "data_collect_{}"
 
 	train_towns = ['town01', 'town03', 'town04',  'town06', ]

@@ -2,7 +2,7 @@
 export CUDA_VISIBLE_DEVICES=1
 export CARLA_ROOT=/workspace/simulation
 export CARLA_SERVER=${CARLA_ROOT}/CarlaUE4.sh
-export PYTHONPATH=$PYTHONPATH:/workspace/source/E2E-AD/ours_v1
+export PYTHONPATH=$PYTHONPATH:/workspace/source/E2E-AD/ours_v5
 export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI
 export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI/carla
 export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI/carla/dist/carla-0.9.10-py3.7-linux-x86_64.egg
@@ -22,10 +22,10 @@ export RESUME=True
 # TCP evaluation
 export ROUTES=leaderboard/data/evaluation_routes/routes_town05_long.xml
 export TEAM_AGENT=team_code/tcp_agent.py
-export TEAM_CONFIG="/workspace/log/TCP/chkpt/ours_v1/debug/best_epoch=20-val_loss=0.783.ckpt"
+export TEAM_CONFIG="/workspace/log/TCP/chkpt/ours_v5/debug/best_epoch=08-val_loss=0.784.ckpt"
 export CHECKPOINT_ENDPOINT=results_TCP.json
 export SCENARIOS=leaderboard/data/scenarios/all_towns_traffic_scenarios.json
-export SAVE_PATH=/workspace/log/TCP/qualitative_res/result_ours_v1_retrained
+export SAVE_PATH=/workspace/log/TCP/qualitative_res/result_ours_v5
 
 # # Roach ap agent evaluation
 # export ROUTES=leaderboard/data/evaluation_routes/routes_town05_long.xml

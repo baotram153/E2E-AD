@@ -126,6 +126,7 @@ class TCP(nn.Module):
 		# 		nn.Linear(256, 256),
 		# 		nn.ReLU(inplace=True),
 		# 	)
+		
 		self.dist_mu = nn.Sequential(nn.Linear(256, dim_out), nn.Softplus())
 		self.dist_sigma = nn.Sequential(nn.Linear(256, dim_out), nn.Softplus())
 
@@ -178,7 +179,8 @@ class TCP(nn.Module):
 		
 		j_traj = self.join_traj(torch.cat([feature_emb, measurement_feature], 1))
 		outputs['pred_value_traj'] = self.value_branch_traj(j_traj)
-		outputs['pred_features_traj'] = j_traj
+		# outputs['pred_features_traj'] = j_traj
+		
 		z = j_traj
 		output_wp = list()
 		traj_hidden_state = list()
@@ -257,7 +259,7 @@ class TCP(nn.Module):
 		imitation_feature = self.imitation_head(torch.cat([feature_emb, measurement_feature], dim=1))
 		j_imitation = self.policy_head_branch_imitation(imitation_feature)
 		outputs['imitation_feature'] = j_imitation
-		outputs['pred_features_ctrl'] = j_imitation
+		# outputs['pred_features_ctrl'] = j_imitation
 
 		'''combine'''
 		policy = self.policy_head_branch_ctrl(torch.cat([j_imitation, j_ctrl_final], dim=1))

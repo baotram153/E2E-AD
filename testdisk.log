@@ -1,0 +1,67 @@
+
+
+Fri Aug  9 19:29:47 2024
+Command line: TestDisk
+
+TestDisk 7.1, Data Recovery Utility, July 2019
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Linux, kernel 6.8.0-35-generic (#35-Ubuntu SMP PREEMPT_DYNAMIC Mon May 20 15:51:52 UTC 2024) x86_64
+Compiler: GCC 13.2
+ext2fs lib: 1.47.0, ntfs lib: libntfs-3g, reiserfs lib: none, ewf lib: none, curses lib: ncurses 6.4
+User is not root!
+Hard disk list
+
+
+TestDisk exited normally.
+Using locale 'en_US.UTF-8'.
+
+
+Fri Aug  9 19:29:54 2024
+Command line: TestDisk /debug
+
+TestDisk 7.1, Data Recovery Utility, July 2019
+Christophe GRENIER <grenier@cgsecurity.org>
+https://www.cgsecurity.org
+OS: Linux, kernel 6.8.0-35-generic (#35-Ubuntu SMP PREEMPT_DYNAMIC Mon May 20 15:51:52 UTC 2024) x86_64
+Compiler: GCC 13.2
+ext2fs lib: 1.47.0, ntfs lib: libntfs-3g, reiserfs lib: none, ewf lib: none, curses lib: ncurses 6.4
+/dev/sda: LBA, HPA, LBA48, DCO support
+/dev/sda: size       3907029168 sectors
+/dev/sda: user_max   3907029168 sectors
+/dev/sda: native_max 3907029168 sectors
+Warning: can't get size for Disk /dev/mapper/control - 0 B - 0 sectors, sector size=512
+Hard disk list
+Disk /dev/sda - 2000 GB / 1863 GiB - CHS 243201 255 63, sector size=512 - ST2000DM008-2UB102, S/N:WK20GV1M, FW:0001
+Disk /dev/loop0 - 4096 B - 8 sectors (RO), sector size=512
+Disk /dev/loop1 - 77 MB / 74 MiB - 152040 sectors (RO), sector size=512
+Disk /dev/loop10 - 40 MB / 38 MiB - 79520 sectors (RO), sector size=512
+Disk /dev/loop11 - 487 KB / 476 KiB - 952 sectors (RO), sector size=512
+Disk /dev/loop12 - 281 MB / 268 MiB - 549752 sectors (RO), sector size=512
+Disk /dev/loop2 - 77 MB / 74 MiB - 152048 sectors (RO), sector size=512
+Disk /dev/loop3 - 280 MB / 267 MiB - 547696 sectors (RO), sector size=512
+Disk /dev/loop4 - 11 MB / 10 MiB - 21952 sectors (RO), sector size=512
+Disk /dev/loop5 - 529 MB / 505 MiB - 1034424 sectors (RO), sector size=512
+Disk /dev/loop6 - 96 MB / 91 MiB - 187776 sectors (RO), sector size=512
+Disk /dev/loop7 - 10 MB / 10 MiB - 21232 sectors (RO), sector size=512
+Disk /dev/loop8 - 11 MB / 10 MiB - 21584 sectors (RO), sector size=512
+Disk /dev/loop9 - 40 MB / 38 MiB - 79328 sectors (RO), sector size=512
+Disk /dev/nvme0n1 - 256 GB / 238 GiB - CHS 244198 64 32, sector size=512
+
+Partition table type (auto): EFI GPT
+Disk /dev/nvme0n1 - 256 GB / 238 GiB
+Partition table type: EFI GPT
+
+Interface Advanced
+hdr_size=92
+hdr_lba_self=1
+hdr_lba_alt=500118191 (expected 500118191)
+hdr_lba_start=2048
+hdr_lba_end=500118158
+hdr_lba_table=2
+hdr_entries=128
+hdr_entsz=128
+ 1 P EFI System                  2048    2203647    2201600
+ 2 P Linux filesys. data      2203648  500115455  497911808
+
+TestDisk exited normally.

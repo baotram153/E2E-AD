@@ -8,7 +8,7 @@ import tqdm
 from multiprocessing import Pool
 
 
-INPUT_FRAMES = 1
+INPUT_FRAMES = 2
 FUTURE_FRAMES = 4
 
 
@@ -33,6 +33,8 @@ def gen_single_route(route_folder):
 	seq_input_theta = []
 
 	seq_front_img = []
+	seq_front_img_past = []
+
 	seq_feature = []
 	seq_value = []
 	seq_speed = []
@@ -60,8 +62,12 @@ def gen_single_route(route_folder):
 	for i in range(length):
 		with open(os.path.join(route_folder, "measurements", f"{str(i).zfill(4)}.json"), "r") as read_file:
 			measurement = json.load(read_file)
-			full_seq_x.append(measurement['y'])
+			# full_seq_x.append(measurement['y'])
+			# full_seq_y.append(measurement['x'])
+
 			full_seq_y.append(measurement['x'])
+			full_seq_x.append(measurement['y'])
+			
 			full_seq_theta.append(measurement['theta'])
 
 
@@ -71,6 +77,58 @@ def gen_single_route(route_folder):
 		full_seq_action_mu.append(roach_supervision_data['action_mu'])
 		full_seq_action_sigma.append(roach_supervision_data['action_sigma'])
 		full_seq_only_ap_brake.append(roach_supervision_data['only_ap_brake'])
+
+	for i in range(INPUT_FRAMES):
+		with open(os.path.join(route_folder, "measurements", f"{str(i).zfill(4)}.json"), "r") as read_file:
+			measurement = json.load(read_file)
+
+		# inputs
+		input_x_list = full_seq_x[:i+1]
+		input_y_list = full_seq_y[:i+1]
+		input_theta_list = full_seq_theta[:i+1]
+
+		front_img_list = [route_folder.replace(data_path,'')+"/rgb/"f"{str(i-_).zfill(4)}.png" for _ in range(i, -1, -1)]
+
+		for j in range(INPUT_FRAMES - len(input_x_list)):
+			input_x_list = [input_x_list[0]] + input_x_list
+			input_y_list = [input_y_list[0]] + input_y_list
+			input_theta_list = [input_theta_list[0]] + input_theta_list
+
+			front_img_list = [front_img_list[0]] + front_img_list
+
+		seq_input_x.append(input_x_list)
+		seq_input_y.append(input_y_list)
+		seq_input_theta.append(input_theta_list)	
+		seq_front_img.append(front_img_list)
+
+		# outputs
+		seq_future_x.append(full_seq_x[i+1:i+FUTURE_FRAMES+1])
+		seq_future_y.append(full_seq_y[i+1:i+FUTURE_FRAMES+1])
+		seq_future_theta.append(full_seq_theta[i+1:i+FUTURE_FRAMES+1])
+
+		seq_future_feature.append(full_seq_feature[i+1:i+FUTURE_FRAMES+1])
+		seq_future_action.append(full_seq_action[i+1:i+FUTURE_FRAMES+1])
+		seq_future_action_mu.append(full_seq_action_mu[i+1:i+FUTURE_FRAMES+1])
+		seq_future_action_sigma.append(full_seq_action_sigma[i+1:i+FUTURE_FRAMES+1])
+		seq_future_only_ap_brake.append(full_seq_only_ap_brake[i+1:i+FUTURE_FRAMES+1])
+
+		roach_supervision_data = np.load(os.path.join(route_folder, "supervision", f"{str(i).zfill(4)}.npy"), allow_pickle=True).item()
+		seq_feature.append(roach_supervision_data["features"])
+		seq_value.append(roach_supervision_data["value"])
+
+		# from measurement
+		seq_speed.append(measurement["speed"])
+
+		seq_action.append(roach_supervision_data["action"])
+		seq_action_mu.append(roach_supervision_data["action_mu"])
+		seq_action_sigma.append(roach_supervision_data["action_sigma"])
+
+		seq_x_target.append(measurement["y_target"])
+		seq_y_target.append(measurement["x_target"])
+		seq_target_command.append(measurement["target_command"])
+
+		seq_only_ap_brake.append(roach_supervision_data["only_ap_brake"])
+
 
 	for i in range(INPUT_FRAMES-1, length-FUTURE_FRAMES):
 
@@ -109,6 +167,9 @@ def gen_single_route(route_folder):
 		seq_target_command.append(measurement["target_command"])
 
 		seq_only_ap_brake.append(roach_supervision_data["only_ap_brake"])
+	
+	# print(seq_front_img)
+	# exit()
 
 	return seq_future_x, seq_future_y, seq_future_theta, seq_future_feature, seq_future_action, seq_future_action_mu, seq_future_action_sigma, seq_future_only_ap_brake, seq_input_x, seq_input_y, seq_input_theta, seq_front_img, seq_feature, seq_value, seq_speed, seq_action, seq_action_mu, seq_action_sigma, seq_x_target, seq_y_target, seq_target_command, seq_only_ap_brake
 
@@ -204,9 +265,10 @@ def gen_sub_folder(folder_path):
 
 if __name__ == '__main__':
 	global data_path
-	data_path = "tcp_carla_data"
-	towns = ["town01","town01_val","town01_addition","town02","town02_val","town03","town03_val","town03_addition", "town04","town04_val", "town04_addition", "town05", "town05_val", "town05_addition" ,"town06","town06_val", "town06_addition","town07", "town07_val", "town10", "town10_addition","town10_val"]
-	pattern = "{}" # town type
+	data_path = "/workspace/datasets/CARLA-data/"
+	towns = ["town01","town01_addition","town02","town02_val","town03","town03_addition", "town04", "town04_addition", "town05", "town05_val" ,"town06", "town06_addition","town07", "town07_val", "town10","town10_val"]
+	# towns = ["towndebug"]
+	pattern = "data_collect_{}" # town type
 	import tqdm
 	total = 0
 	for town in tqdm.tqdm(towns):
@@ -214,5 +276,3 @@ if __name__ == '__main__':
 		total += number
 
 	print(total)
-
-	
