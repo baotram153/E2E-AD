@@ -204,9 +204,10 @@ def gen_sub_folder(folder_path):
 
 if __name__ == '__main__':
 	global data_path
-	data_path = "tcp_carla_data"
-	towns = ["town01","town01_val","town01_addition","town02","town02_val","town03","town03_val","town03_addition", "town04","town04_val", "town04_addition", "town05", "town05_val", "town05_addition" ,"town06","town06_val", "town06_addition","town07", "town07_val", "town10", "town10_addition","town10_val"]
-	pattern = "{}" # town type
+	data_path = "/workspace/datasets/CARLA-data/"
+	towns = ["town01","town01_addition","town02","town02_val","town03","town03_addition", "town04", "town04_addition", "town05", "town05_val" ,"town06", "town06_addition","town07", "town07_val", "town10","town10_val"]
+	# towns = ["towndebug"]
+	pattern = "data_collect_{}" # town type
 	import tqdm
 	total = 0
 	for town in tqdm.tqdm(towns):

@@ -185,9 +185,11 @@ if __name__ == "__main__":
 	dataloader_train = DataLoader(train_set, batch_size=args.batch_size, shuffle=True, num_workers=8)
 	dataloader_val = DataLoader(val_set, batch_size=args.batch_size, shuffle=False, num_workers=8)
 
-	TCP_model = TCP_planner(config, args.lr)
+	# TCP_model = TCP_planner(config, args.lr)
+	TCP_model = TCP_planner.load_from_checkpoint(config.ckpt_path, config=config, lr=args.lr)
 
-	checkpoint_callback = ModelCheckpoint(save_weights_only=False, mode="min", monitor="val_loss", save_top_k=2, save_last=True,
+
+	checkpoint_callback = ModelCheckpoint(save_weights_only=False, mode="min", monitor="val_loss", save_top_k=4, save_last=True,
 											dirpath=args.logdir, filename="best_{epoch:02d}-{val_loss:.3f}")
 	checkpoint_callback.CHECKPOINT_NAME_LAST = "{epoch}-last"
 	trainer = pl.Trainer.from_argparse_args(args,

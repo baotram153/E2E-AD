@@ -9,8 +9,11 @@ class GlobalConfig:
 	seq_len = 1 # input timesteps
 	pred_len = 4 # future waypoints predicted
 
+	# checkpoint
+	ckpt_path = "/workspace/log/TCP/chkpt/ours_v5/change_loss_weight=0.1/best_epoch=14-val_loss=0.793.ckpt"
+
 	# data root
-	root_dir_all = "/workspace/datasets/CARLA-data"
+	root_dir_all = "/workspace/datasets/CARLA-data/"
 	data_dir_pattern = "data_collect_{}"
 
 	train_towns = ['town01', 'town03', 'town04',  'town06', ]
@@ -62,7 +65,7 @@ class GlobalConfig:
 
 	speed_weight = 0.05
 	value_weight = 0.001
-	features_weight = 0.01
+	features_weight = 0.1
 	
 	rl_ckpt = "roach/log/ckpt_11833344.pth"
 

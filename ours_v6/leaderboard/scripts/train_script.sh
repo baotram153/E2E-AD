@@ -8,3 +8,6 @@ python TCP/train.py --gpus 1 \
     --batch_size 32 \
     --logdir "/workspace/log/TCP/chkpt/ours_v6" \
     --id "debug"
+
+# remember to regenerate data before training
+# ckpt from epoch 4

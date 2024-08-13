@@ -1,7 +1,7 @@
 import os
 
 class GlobalConfig:
-	""" base architecture configurations """
+	""" flow model configurations """
 	# RAFT for optical flow
 	model = "TCP/RAFT/models/raft-things.pth"
 	small = False
@@ -15,6 +15,9 @@ class GlobalConfig:
 	# Data
 	seq_len = 1 # input timesteps
 	pred_len = 4 # future waypoints predicted
+
+	# log root
+	ckpt_path = "/workspace/log/TCP/chkpt/ours_v6/debug/best_epoch=04-val_loss=1.078.ckpt"
 
 	# data root
 	root_dir_all = "/workspace/datasets/CARLA-data/"
