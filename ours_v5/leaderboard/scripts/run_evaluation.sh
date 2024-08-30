@@ -1,5 +1,5 @@
 #!/bin/bash
-export CUDA_VISIBLE_DEVICES=1
+export CUDA_VISIBLE_DEVICES=0
 export CARLA_ROOT=/workspace/simulation
 export CARLA_SERVER=${CARLA_ROOT}/CarlaUE4.sh
 export PYTHONPATH=$PYTHONPATH:/workspace/source/E2E-AD/ours_v5
@@ -22,7 +22,7 @@ export RESUME=True
 # TCP evaluation
 export ROUTES=leaderboard/data/evaluation_routes/routes_town05_long.xml
 export TEAM_AGENT=team_code/tcp_agent.py
-export TEAM_CONFIG="/workspace/log/TCP/chkpt/ours_v5/debug/best_epoch=08-val_loss=0.784.ckpt"
+export TEAM_CONFIG="/workspace/log/TCP/chkpt/ours_v5/change_loss_weight=0.01/best_epoch=11-val_loss=0.733.ckpt"
 export CHECKPOINT_ENDPOINT=results_TCP.json
 export SCENARIOS=leaderboard/data/scenarios/all_towns_traffic_scenarios.json
 export SAVE_PATH=/workspace/log/TCP/qualitative_res/result_ours_v5
