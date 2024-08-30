@@ -17,7 +17,7 @@ class GlobalConfig:
 	pred_len = 4 # future waypoints predicted
 
 	# log root
-	ckpt_path = "/workspace/log/TCP/chkpt/ours_v6/debug/best_epoch=04-val_loss=1.078.ckpt"
+	ckpt_path = "/workspace/log/TCP/chkpt/ours_v6/debug/best_epoch=08-val_loss=0.976.ckpt"
 
 	# data root
 	root_dir_all = "/workspace/datasets/CARLA-data/"
