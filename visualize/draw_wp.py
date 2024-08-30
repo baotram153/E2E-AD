@@ -6,7 +6,7 @@ import pathlib
 import os
 
 parser = argparse.ArgumentParser()
-parser.add_argument('root_dir', type=str, default="/workspace/log/TCP/qualitative_res")
+parser.add_argument('--root_dir', type=str, default="/workspace/log/TCP/qualitative_res")
 parser.add_argument('--model', type=str, help="Name of the model")
 parser.add_argument('--route', type=str, help="Route's id")
 parser.add_argument('--frame', type=str, help="Frame number")
