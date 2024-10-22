@@ -46,9 +46,9 @@ training:
 obs_configs:
   birdview:
     module: birdview.chauffeurnet
-    width_in_pixels: 192
-    pixels_ev_to_bottom: 40
-    pixels_per_meter: 5.0
+    width_in_pixels: 200    # 192
+    pixels_ev_to_bottom: 100   # 40
+    pixels_per_meter: 5.0     # 5
     history_idx:
     - -16
     - -11

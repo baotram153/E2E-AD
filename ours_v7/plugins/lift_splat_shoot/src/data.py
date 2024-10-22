@@ -1,0 +1,569 @@
+"""
+Copyright (C) 2020 NVIDIA Corporation.  All rights reserved.
+Licensed under the NVIDIA Source Code License. See LICENSE at https://github.com/nv-tlabs/lift-splat-shoot.
+Authors: Jonah Philion and Sanja Fidler
+"""
+
+import torch
+import os
+import numpy as np
+from PIL import Image
+import cv2
+from pyquaternion import Quaternion
+from nuscenes.nuscenes import NuScenes
+from nuscenes.utils.splits import create_splits_scenes
+from nuscenes.utils.data_classes import Box
+from glob import glob
+
+from .tools import get_lidar_data, img_transform, normalize_img, gen_dx_bx
+
+
+class NuscData(torch.utils.data.Dataset):
+    def __init__(self, nusc, is_train, data_aug_conf, grid_conf):
+        self.nusc = nusc
+        self.is_train = is_train
+        self.data_aug_conf = data_aug_conf
+        self.grid_conf = grid_conf
+
+        self.scenes = self.get_scenes()
+        self.ixes = self.prepro()
+
+        dx, bx, nx = gen_dx_bx(grid_conf['xbound'], grid_conf['ybound'], grid_conf['zbound'])
+        self.dx, self.bx, self.nx = dx.numpy(), bx.numpy(), nx.numpy()
+
+        self.fix_nuscenes_formatting()
+
+        print(self)
+
+    def fix_nuscenes_formatting(self):
+        """If nuscenes is stored with trainval/1 trainval/2 ... structure, adjust the file paths
+        stored in the nuScenes object.
+        """
+        # check if default file paths work
+        rec = self.ixes[0]
+        sampimg = self.nusc.get('sample_data', rec['data']['CAM_FRONT'])
+        imgname = os.path.join(self.nusc.dataroot, sampimg['filename'])
+
+        def find_name(f):
+            d, fi = os.path.split(f)
+            d, di = os.path.split(d)
+            d, d0 = os.path.split(d)
+            d, d1 = os.path.split(d)
+            d, d2 = os.path.split(d)
+            return di, fi, f'{d2}/{d1}/{d0}/{di}/{fi}'
+
+        # adjust the image paths if needed
+        if not os.path.isfile(imgname):
+            print('adjusting nuscenes file paths')
+            fs = glob(os.path.join(self.nusc.dataroot, 'samples/*/samples/CAM*/*.jpg'))
+            fs += glob(os.path.join(self.nusc.dataroot, 'samples/*/samples/LIDAR_TOP/*.pcd.bin'))
+            info = {}
+            for f in fs:
+                di, fi, fname = find_name(f)
+                info[f'samples/{di}/{fi}'] = fname
+            fs = glob(os.path.join(self.nusc.dataroot, 'sweeps/*/sweeps/LIDAR_TOP/*.pcd.bin'))
+            for f in fs:
+                di, fi, fname = find_name(f)
+                info[f'sweeps/{di}/{fi}'] = fname
+            for rec in self.nusc.sample_data:
+                if rec['channel'] == 'LIDAR_TOP' or (rec['is_key_frame'] and rec['channel'] in self.data_aug_conf['cams']):
+                    rec['filename'] = info[rec['filename']]
+
+    
+    def get_scenes(self):
+        # filter by scene split
+        split = {
+            'v1.0-trainval': {True: 'train', False: 'val'},
+            'v1.0-mini': {True: 'mini_train', False: 'mini_val'},
+        }[self.nusc.version][self.is_train]
+
+        scenes = create_splits_scenes()[split]
+
+        return scenes
+
+    def prepro(self):
+        samples = [samp for samp in self.nusc.sample]
+
+        # remove samples that aren't in this split
+        samples = [samp for samp in samples if
+                   self.nusc.get('scene', samp['scene_token'])['name'] in self.scenes]
+
+        # sort by scene, timestamp (only to make chronological viz easier)
+        samples.sort(key=lambda x: (x['scene_token'], x['timestamp']))
+
+        return samples
+    
+    def sample_augmentation(self):
+        H, W = self.data_aug_conf['H'], self.data_aug_conf['W']
+        fH, fW = self.data_aug_conf['final_dim']
+        if self.is_train:
+            resize = np.random.uniform(*self.data_aug_conf['resize_lim'])
+            resize_dims = (int(W*resize), int(H*resize))
+            newW, newH = resize_dims
+            crop_h = int((1 - np.random.uniform(*self.data_aug_conf['bot_pct_lim']))*newH) - fH
+            crop_w = int(np.random.uniform(0, max(0, newW - fW)))
+            crop = (crop_w, crop_h, crop_w + fW, crop_h + fH)
+            flip = False
+            if self.data_aug_conf['rand_flip'] and np.random.choice([0, 1]):
+                flip = True
+            rotate = np.random.uniform(*self.data_aug_conf['rot_lim'])
+        else:
+            resize = max(fH/H, fW/W)
+            resize_dims = (int(W*resize), int(H*resize))
+            newW, newH = resize_dims
+            crop_h = int((1 - np.mean(self.data_aug_conf['bot_pct_lim']))*newH) - fH
+            crop_w = int(max(0, newW - fW) / 2)
+            crop = (crop_w, crop_h, crop_w + fW, crop_h + fH)
+            flip = False
+            rotate = 0
+        return resize, resize_dims, crop, flip, rotate
+
+    def get_image_data(self, rec, cams):
+        imgs = []
+        rots = []
+        trans = []
+        intrins = []
+        post_rots = []
+        post_trans = []
+        for cam in cams:
+            samp = self.nusc.get('sample_data', rec['data'][cam])
+            imgname = os.path.join(self.nusc.dataroot, samp['filename'])
+            img = Image.open(imgname)
+            post_rot = torch.eye(2)
+            post_tran = torch.zeros(2)
+
+            sens = self.nusc.get('calibrated_sensor', samp['calibrated_sensor_token'])
+            intrin = torch.Tensor(sens['camera_intrinsic'])
+            rot = torch.Tensor(Quaternion(sens['rotation']).rotation_matrix)
+            tran = torch.Tensor(sens['translation'])
+
+            # augmentation (resize, crop, horizontal flip, rotate)
+            resize, resize_dims, crop, flip, rotate = self.sample_augmentation()
+            img, post_rot2, post_tran2 = img_transform(img, post_rot, post_tran,
+                                                     resize=resize,
+                                                     resize_dims=resize_dims,
+                                                     crop=crop,
+                                                     flip=flip,
+                                                     rotate=rotate,
+                                                     )
+            
+            # for convenience, make augmentation matrices 3x3
+            post_tran = torch.zeros(3)
+            post_rot = torch.eye(3)
+            post_tran[:2] = post_tran2
+            post_rot[:2, :2] = post_rot2
+
+            imgs.append(normalize_img(img))
+            intrins.append(intrin)
+            rots.append(rot)
+            trans.append(tran)
+            post_rots.append(post_rot)
+            post_trans.append(post_tran)
+
+        return (torch.stack(imgs), torch.stack(rots), torch.stack(trans),
+                torch.stack(intrins), torch.stack(post_rots), torch.stack(post_trans))
+
+    def get_lidar_data(self, rec, nsweeps):
+        pts = get_lidar_data(self.nusc, rec,
+                       nsweeps=nsweeps, min_distance=2.2)
+        return torch.Tensor(pts)[:3]  # x,y,z
+
+    def get_binimg(self, rec):
+        egopose = self.nusc.get('ego_pose',
+                                self.nusc.get('sample_data', rec['data']['LIDAR_TOP'])['ego_pose_token'])
+        trans = -np.array(egopose['translation'])
+        rot = Quaternion(egopose['rotation']).inverse
+        img = np.zeros((self.nx[0], self.nx[1]))
+        for tok in rec['anns']:
+            inst = self.nusc.get('sample_annotation', tok)
+            # add category for lyft
+            if not inst['category_name'].split('.')[0] == 'vehicle':
+                continue
+            box = Box(inst['translation'], inst['size'], Quaternion(inst['rotation']))
+            box.translate(trans)
+            box.rotate(rot)
+
+            pts = box.bottom_corners()[:2].T
+            pts = np.round(
+                (pts - self.bx[:2] + self.dx[:2]/2.) / self.dx[:2]
+                ).astype(np.int32)
+            pts[:, [1, 0]] = pts[:, [0, 1]]
+            cv2.fillPoly(img, [pts], 1.0)
+
+        return torch.Tensor(img).unsqueeze(0)
+
+    def choose_cams(self):
+        if self.is_train and self.data_aug_conf['Ncams'] < len(self.data_aug_conf['cams']):
+            cams = np.random.choice(self.data_aug_conf['cams'], self.data_aug_conf['Ncams'],
+                                    replace=False)
+        else:
+            cams = self.data_aug_conf['cams']
+        return cams
+
+    def __str__(self):
+        return f"""NuscData: {len(self)} samples. Split: {"train" if self.is_train else "val"}.
+                   Augmentation Conf: {self.data_aug_conf}"""
+
+    def __len__(self):
+        return len(self.ixes)
+
+
+class VizData(NuscData):
+    def __init__(self, *args, **kwargs):
+        super(VizData, self).__init__(*args, **kwargs)
+    
+    def __getitem__(self, index):
+        rec = self.ixes[index]
+        
+        cams = self.choose_cams()
+        imgs, rots, trans, intrins, post_rots, post_trans = self.get_image_data(rec, cams)
+        lidar_data = self.get_lidar_data(rec, nsweeps=3)
+        binimg = self.get_binimg(rec)
+        
+        return imgs, rots, trans, intrins, post_rots, post_trans, lidar_data, binimg
+
+
+class SegmentationData(NuscData):
+    def __init__(self, *args, **kwargs):
+        super(SegmentationData, self).__init__(*args, **kwargs)
+    
+    def __getitem__(self, index):
+        rec = self.ixes[index]
+
+        cams = self.choose_cams()
+        imgs, rots, trans, intrins, post_rots, post_trans = self.get_image_data(rec, cams)
+        binimg = self.get_binimg(rec)
+        
+        return imgs, rots, trans, intrins, post_rots, post_trans, binimg
+    
+class SegmentationCarlaData(torch.utils.data.Dataset):
+    # use for evaluation
+    def __init__(self, front_imgs, data_aug_conf, grid_conf):
+        self.root_dir = "/workspace/datasets/CARLA-data/"
+        self.data_aug_conf = data_aug_conf
+        self.grid_conf = grid_conf
+        self.front_img = front_imgs     # contain paths to front images
+
+    def __len__(self):
+        return len(self.front_img)
+    
+    def __getitem__(self, index):
+        rec = self.front_img[index]
+
+        cams = self.choose_cams()
+        imgs, rots, trans, intrins, post_rots, post_trans = self.get_image_data(rec, cams)
+        binimg = torch.eye(3)   # what is binimg?
+        
+        return imgs, rots, trans, intrins, post_rots, post_trans, binimg
+
+    def choose_cams(self):
+        cams = self.data_aug_conf['cams']
+        return cams
+
+    def sample_augmentation(self):
+        # read more carefully
+        H, W = self.data_aug_conf['H'], self.data_aug_conf['W']
+        fH, fW = self.data_aug_conf['final_dim']
+        resize = max(fH/H, fW/W)
+        resize_dims = (int(W*resize), int(H*resize))
+        # print(resize_dims)
+        newW, newH = resize_dims
+        crop_h = int((1 - np.mean(self.data_aug_conf['bot_pct_lim']))*newH) - fH
+        crop_w = int(max(0, newW - fW) / 2)
+        crop = (crop_w, crop_h, crop_w + fW, crop_h + fH)
+        flip = False
+        rotate = 0
+        return resize, resize_dims, crop, flip, rotate
+
+    def build_intrinsic_matrix(self):
+        '''
+        K = [[Fx, 0,  w/2, 0],
+             [0,  Fy, h/2, 0],
+             [0,  0,  1,   0]]
+        '''
+        W, H = self.data_aug_conf['W'], self.data_aug_conf['H']
+        fov = 100
+        focal = W / (2.0 * np.tan(fov * np.pi / 360.0))
+        # focal_y = image_h / (2.0 * np.tan(fov * np.pi / 360.0))
+
+        # In this case Fx and Fy are the same since the pixel aspect
+        # ratio is 1
+        intrinsic = torch.eye(3)
+        intrinsic[0, 0] = focal
+        intrinsic[1, 1] = focal
+        intrinsic[0, 2] = W / 2.0
+        intrinsic[1, 2] = H / 2.0
+        # print(intrinsic)
+        # exit()
+        # intrinsic = torch.Tensor([[276.16257756, 0., 449.5], [0., 276.16257756, 127.5], [0., 0., 1.]])
+        return intrinsic
+
+    def build_rotation_matrix(self):
+        return torch.Tensor([ [0.0, 1.0, 0.0] , [0.0, 0.0, -1.0] , [1.0, 0.0, 0.0] ])
+        # return torch.eye(3)
+
+    
+    def build_translation_matrix(self):
+        # return torch.zeros((3,))t
+        translation = torch.zeros((3,))
+        translation[0] = -1.5   # change to 1.5 if doesn't work
+        translation[1] = 0
+        translation[2] = 2
+        return torch.Tensor([0, 2, 1.5])
+        # return translation
+    
+    def get_image_data(self, rec, cams):
+        imgs = []
+        rots = []
+        trans = []
+        intrins = []
+        post_rots = []
+        post_trans = []
+
+        img_path = rec
+        img = Image.open(os.path.join(self.root_dir, img_path))
+ 
+        post_rot = torch.eye(2)
+        post_tran = torch.zeros(2)
+
+        intrin = self.build_intrinsic_matrix()
+        rot = self.build_rotation_matrix()
+        tran = self.build_translation_matrix()
+
+        # augmentation (resize, crop, horizontal flip, rotate)
+        resize, resize_dims, crop, flip, rotate = self.sample_augmentation()
+        img, post_rot2, post_tran2 = img_transform(img, post_rot, post_tran,
+                                                    resize=resize,
+                                                    resize_dims=resize_dims,
+                                                    crop=crop,
+                                                    flip=flip,
+                                                    rotate=rotate,
+                                                    )
+        
+        # for convenience, make augmentation matrices 3x3
+        post_tran = torch.zeros(3)
+        post_rot = torch.eye(3)
+        post_tran[:2] = post_tran2
+        post_rot[:2, :2] = post_rot2
+
+        # img.save("imgs/augmented_img.png")
+
+        imgs.append(normalize_img(img))
+        intrins.append(intrin)
+        rots.append(rot)
+        trans.append(tran)
+        post_rots.append(post_rot)
+        post_trans.append(post_tran)
+
+        return (torch.stack(imgs), torch.stack(rots), torch.stack(trans),
+                torch.stack(intrins), torch.stack(post_rots), torch.stack(post_trans))
+
+class CarlaData(torch.utils.data.Dataset):
+    def __init__(self, root_dir, data_aug_conf, grid_conf):
+        # no choose_cam() because there's only 1 front cam
+        self.root_dir = root_dir
+
+        self.img_paths = []
+        self.bev_masks = []
+
+        for route in os.listdir(self.root_dir):
+            rgb_dir = os.path.join(self.root_dir, route, 'rgb')
+            bev_dir = os.path.join(self.root_dir, route, 'bev_masks')
+
+            len_route = len(os.listdir(rgb_dir))
+
+            self.img_paths.extend([rgb_dir + "/" + rgb_img for rgb_img in sorted(os.listdir(rgb_dir))])
+
+            for i in range(len_route):
+                bev = np.load((str(bev_dir) + '/' + f"{i}".zfill(4) + f".npy"))
+                self.bev_masks.append(torch.from_numpy(bev.astype(np.float32)).unsqueeze(0))
+
+        self.data_aug_conf = data_aug_conf
+        self.grid_conf = grid_conf
+        self.len_train = int((len(self.img_paths)*0.8))
+
+    def __len__(self):
+        return len(self.img_paths)
+    
+    def __getitem__(self, index):
+        imgs, rots, trans, intrins, post_rots, post_trans = self.get_image_data(self.img_paths[index])
+        binimg = self.bev_masks[index]   # what is binimg?
+        
+        return imgs, rots, trans, intrins, post_rots, post_trans, binimg
+
+    def sample_augmentation(self):
+        # read more carefully
+        H, W = self.data_aug_conf['H'], self.data_aug_conf['W']
+        fH, fW = self.data_aug_conf['final_dim']
+        resize = max(fH/H, fW/W)
+        resize_dims = (int(W*resize), int(H*resize))
+        # print(resize_dims)
+        newW, newH = resize_dims
+        crop_h = int((1 - np.mean(self.data_aug_conf['bot_pct_lim']))*newH) - fH    # what if this is negative? -> padding, chấp nhận cắt phần dưới :v
+        crop_w = int(max(0, newW - fW) / 2)
+        crop = (crop_w, crop_h, crop_w + fW, crop_h + fH)
+        flip = False
+        rotate = 0
+        return resize, resize_dims, crop, flip, rotate
+
+    def build_intrinsic_matrix(self):
+        '''
+        K = [[Fx, 0,  w/2, 0],
+             [0,  Fy, h/2, 0],
+             [0,  0,  1,   0]]
+        '''
+        W, H = self.data_aug_conf['W'], self.data_aug_conf['H']
+        fov = 100
+        focal = W / (2.0 * np.tan(fov * np.pi / 360.0))
+        # focal_y = image_h / (2.0 * np.tan(fov * np.pi / 360.0))
+
+        # In this case Fx and Fy are the same since the pixel aspect
+        # ratio is 1
+        intrinsic = torch.eye(3)
+        intrinsic[0, 0] = focal
+        intrinsic[1, 1] = focal
+        intrinsic[0, 2] = W / 2.0
+        intrinsic[1, 2] = H / 2.0
+        # print(intrinsic)
+        # exit()
+        # intrinsic = torch.Tensor([[276.16257756, 0., 449.5], [0., 276.16257756, 127.5], [0., 0., 1.]])
+        return intrinsic
+
+    def build_rotation_matrix(self):
+        return torch.Tensor([ [0.0, 1.0, 0.0] , [0.0, 0.0, -1.0] , [1.0, 0.0, 0.0] ])   # DriveAdapter
+        # return torch.eye(3)
+
+    
+    def build_translation_matrix(self):
+        # return torch.zeros((3,))t
+        translation = torch.zeros((3,))
+        translation[0] = -1.5   # change to 1.5 if doesn't work
+        translation[1] = 0
+        translation[2] = 2
+        return torch.Tensor([0, 2, 1.5])    # DriveAdapter
+        # return translation
+    
+    def get_image_data(self, img_path):
+        imgs = []
+        rots = []
+        trans = []
+        intrins = []
+        post_rots = []
+        post_trans = []
+
+        img = Image.open(os.path.join(self.root_dir, img_path))
+ 
+        post_rot = torch.eye(2)
+        post_tran = torch.zeros(2)
+
+        intrin = self.build_intrinsic_matrix()
+        rot = self.build_rotation_matrix()
+        tran = self.build_translation_matrix()
+
+        # augmentation (resize, crop, horizontal flip, rotate)
+        resize, resize_dims, crop, flip, rotate = self.sample_augmentation()
+
+        # return intrinsic, extrinsic matrices after augmentation
+        img, post_rot2, post_tran2 = img_transform(img, post_rot, post_tran,
+                                                    resize=resize,
+                                                    resize_dims=resize_dims,
+                                                    crop=crop,
+                                                    flip=flip,
+                                                    rotate=rotate,
+                                                    )
+        
+        # for convenience, make augmentation matrices 3x3
+        post_tran = torch.zeros(3)
+        post_rot = torch.eye(3)
+        post_tran[:2] = post_tran2
+        post_rot[:2, :2] = post_rot2
+
+        # img.save("imgs/augmented_img.png")
+
+        imgs.append(normalize_img(img))
+        intrins.append(intrin)
+        rots.append(rot)
+        trans.append(tran)
+        post_rots.append(post_rot)
+        post_trans.append(post_tran)
+
+        return (torch.stack(imgs), torch.stack(rots), torch.stack(trans),
+                torch.stack(intrins), torch.stack(post_rots), torch.stack(post_trans))
+
+class CarlaDataTrain(CarlaData):
+    def __init__(self, root_dir, data_aug_conf, grid_conf):
+        super().__init__(root_dir, data_aug_conf, grid_conf)
+        self.img_paths = self.img_paths[:self.len_train]
+        self.bev_masks = self.bev_masks[:self.len_train]
+
+        # print("In carla data train:")
+        # print(len(self.img_paths))
+        # print(self.img_paths[0])
+        # print(len(self.bev_masks))
+        # cv2.imwrite("train_bev.png", self.bev_masks[0]*255)
+        # img = cv2.imread(self.img_paths[0])
+        # cv2.imwrite("train.png", img)
+        # print(self.bev_masks[0])
+
+class CarlaDataVal(CarlaData):
+    def __init__(self, root_dir, data_aug_conf, grid_conf):
+        super().__init__(root_dir, data_aug_conf, grid_conf)
+        self.img_paths = self.img_paths[self.len_train:]
+        self.bev_masks = self.bev_masks[self.len_train:]
+
+        # print("In carla data val:")
+        # print(len(self.img_paths))
+        # print(self.img_paths[0])
+        # cv2.imwrite("val_bev.png", self.bev_masks[0]*255)
+        # img = cv2.imread(self.img_paths[0])
+        # cv2.imwrite("val.png", img)
+
+        # exit()
+
+
+def worker_rnd_init(x):
+    np.random.seed(13 + x)
+
+
+def compile_data(version, data_folder, data_aug_conf, grid_conf, bsz,
+                 nworkers, parser_name):
+    # nusc = NuScenes(version='v1.0-{}'.format(version),
+    #                 dataroot=os.path.join(dataroot, version),
+    #                 verbose=False)
+
+    # try 1 data folder
+    data = np.load(os.path.join(data_folder, "packed_data.npy"), allow_pickle=True).item()
+    front_imgs = [img_pair[0] for img_pair in data["front_img"]] 
+
+    # print(front_imgs)
+
+    parser = {
+        'vizdata': VizData,
+        'segmentationdata': SegmentationData,
+        'segmentationdatacarla': SegmentationCarlaData,
+        'carladata' : [CarlaDataTrain, CarlaDataVal]
+    }[parser_name]
+
+    # loader for training
+    traindata = parser[0](root_dir=data_folder, data_aug_conf=data_aug_conf, grid_conf=grid_conf)
+    valdata = parser[1](root_dir=data_folder, data_aug_conf=data_aug_conf, grid_conf=grid_conf)
+
+    trainloader = torch.utils.data.DataLoader(traindata, batch_size=bsz,
+                                              shuffle=True,
+                                              num_workers=nworkers,
+                                              drop_last=True,
+                                              worker_init_fn=worker_rnd_init)
+
+    valloader = torch.utils.data.DataLoader(valdata, batch_size=bsz,
+                                            shuffle=False,
+                                            num_workers=nworkers)
+    
+    # loader for validation
+    # trainloader = []
+    # valdata = SegmentationCarlaData(front_imgs, data_aug_conf=data_aug_conf, grid_conf=grid_conf)
+    
+    # valloader = torch.utils.data.DataLoader(valdata, batch_size=bsz,
+    #                                         shuffle=False,
+    #                                         num_workers=nworkers)
+    return trainloader, valloader
+    # return valloader

@@ -6,6 +6,7 @@ from torch.utils.data import Dataset
 from torchvision import transforms as T
 
 from TCP.augment import hard as augmenter
+from plugins.lift_splat_shoot.src.tools import img_transform, normalize_img
 
 class CARLA_Data(Dataset):
 
@@ -22,7 +23,6 @@ class CARLA_Data(Dataset):
 		self.target_gps = []
 		self.theta = []
 		self.speed = []
-
 
 		self.value = []
 		self.feature = []
@@ -88,14 +88,89 @@ class CARLA_Data(Dataset):
 	def __getitem__(self, index):
 		"""Returns the item at index idx. """
 		data = dict()
-		data['front_img'] = self.front_img[index]
+		data['front_img'] = self.front_img[index][0]
 
-		if self.img_aug:
-			data['front_img'] = self._im_transform(augmenter(self._batch_read_number).augment_image(np.array(
-					Image.open(self.root+self.front_img[index][0]))))
-		else:
-			data['front_img'] = self._im_transform(np.array(
-					Image.open(self.root+self.front_img[index][0])))
+		img = Image.open(self.root + data['front_img'])
+		# LSS module
+		H=900
+		W=1600
+		resize_lim=(0.193, 0.225)
+		final_dim=(128, 352)
+		bot_pct_lim=(0.0, 0.22)
+		rot_lim=(-5.4, 5.4)
+		rand_flip=True
+		ncams=5
+		max_grad_norm=5.0
+		pos_weight=2.13
+
+		lss_ckpt_path='plugins/lift_splat_shoot/runs/model90000.pt'
+
+		xbound=[-50.0, 50.0, 0.5]
+		ybound=[-50.0, 50.0, 0.5]
+		zbound=[-10.0, 10.0, 20.0]
+		dbound=[4.0, 45.0, 1.0]
+
+		grid_conf = grid_conf = {
+			'xbound': xbound,
+			'ybound': ybound,
+			'zbound': zbound,
+			'dbound': dbound,
+		}
+
+		data_aug_conf = {
+						'resize_lim': resize_lim,
+						'final_dim': final_dim,
+						'rot_lim': rot_lim,
+						'H': H, 'W': W,
+						'rand_flip': rand_flip,
+						'bot_pct_lim': bot_pct_lim,
+						'cams': ['CAM_FRONT_LEFT', 'CAM_FRONT', 'CAM_FRONT_RIGHT',
+								'CAM_BACK_LEFT', 'CAM_BACK', 'CAM_BACK_RIGHT'],
+						'Ncams': ncams,
+		}
+		outC = 1
+
+		# rots, trans, intrins, post_rots, post_trans
+		fH, fW = final_dim
+		resize = max(fH/H, fW/W)
+		resize_dims = (int(W*resize), int(H*resize))
+		newW, newH = resize_dims
+		crop_h = int((1 - np.mean(bot_pct_lim))*newH) - fH    # what if this is negative? -> padding, chấp nhận cắt phần dưới :v
+		crop_w = int(max(0, newW - fW) / 2)
+		crop = (crop_w, crop_h, crop_w + fW, crop_h + fH)
+		flip = False
+		rotate = 0
+		post_rot = torch.eye(2)
+		post_tran = torch.zeros(2)
+		img_transformed, post_rot2, post_tran2 = img_transform(img, post_rot, post_tran,
+												resize=resize,
+												resize_dims=resize_dims,
+												crop=crop,
+												flip=flip,
+												rotate=rotate,
+												)
+		img_transformed_norm = normalize_img(img).unsqueeze(0)
+		post_tran = torch.zeros(3)
+		post_rot = torch.eye(3)
+		post_tran[:2] = post_tran2
+		post_rot[:2, :2] = post_rot2
+
+		data['post_tran'] = post_tran
+		data['post_rot'] = post_rot
+		
+		data['front_img'] = img_transformed_norm
+
+		# data['front_img_PIL'] = Image.open(self.root + self.front_img[index][0])
+
+		# print(self.front_img[index])
+		# exit()
+
+		# if self.img_aug:
+		# 	data['front_img'] = self._im_transform(augmenter(self._batch_read_number).augment_image(np.array(
+		# 			Image.open(self.root+self.front_img[index][0]))))
+		# else:
+		# 	data['front_img'] = self._im_transform(np.array(
+		# 			Image.open(self.root+self.front_img[index][0])))
 
 		# fix for theta=nan in some measurements
 		if np.isnan(self.theta[index][0]):

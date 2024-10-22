@@ -4,6 +4,10 @@ import torch
 from torch import nn
 from TCP.resnet import *
 from TCP.transformer import *
+from plugins.lift_splat_shoot.src.models import compile_model
+from plugins.lift_splat_shoot.src.tools import img_transform, normalize_img
+import copy
+
 
 
 class PIDController(object):
@@ -40,6 +44,10 @@ class TCP(nn.Module):
 		self.speed_controller = PIDController(K_P=config.speed_KP, K_I=config.speed_KI, K_D=config.speed_KD, n=config.speed_n)
 
 		self.perception = resnet34(pretrained=True)
+
+		# process lss module
+		self.lss_module = compile_model(config.grid_conf, config.data_aug_conf, config.outC)
+		self.lss_module.load_state_dict(torch.load(config.lss_ckpt_path))
 
 		self.measurements = nn.Sequential(	
 							nn.Linear(1+2+6, 256),
@@ -150,9 +158,25 @@ class TCP(nn.Module):
 			nn.ReLU(inplace=True),
 		)
 
+	def forward(self, img, post_tran, post_rot, state, target_point):
+		# bev branch
+		
+		# for convenience, make augmentation matrices 3x3
+		rots = self.config.rotation.unsqueeze(0).unsqueeze(0)
+		trans = self.config.translation.unsqueeze(0).unsqueeze(0)
+		intrins = self.config.intrinsic.unsqueeze(0).unsqueeze(0)
+		post_rots = post_rot.unsqueeze(0)
+		post_trans = post_tran.unsqueeze(0)
 
+		# print(rots.shape)
+		# print(trans.shape)
+		# exit()
 
-	def forward(self, img, state, target_point):
+		bev_seg = self.lss_module(img, rots, trans, intrins, post_rots, post_trans)
+		print(bev_seg.shape)
+		exit()
+
+		# rgb encoder branch
 		feature_emb, cnn_feature = self.perception(img)
 		outputs = {}
 		outputs['pred_speed'] = self.speed_branch(feature_emb)
@@ -181,6 +205,7 @@ class TCP(nn.Module):
 		outputs['pred_wp'] = pred_wp
 
 		traj_hidden_state = torch.stack(traj_hidden_state, dim=1)
+
 		# init_att = self.init_att(measurement_feature).view(-1, 1, 8, 29)	# original 
 		# feature_emb = torch.sum(cnn_feature*init_att, dim=(2, 3))
 		# j_ctrl = self.join_ctrl(torch.cat([feature_emb, measurement_feature], 1))

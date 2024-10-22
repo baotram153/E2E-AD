@@ -21,7 +21,7 @@ export RESUME=True
 
 # TCP evaluation
 export ROUTES=leaderboard/data/evaluation_routes/routes_town05_long.xml
-export TEAM_AGENT=team_code/tcp_agent.py
+export TEAM_AGENT=team_code/roach_ap_agent
 export TEAM_CONFIG="/workspace/log/TCP/chkpt/ours_v1/debug/best_epoch=20-val_loss=0.783.ckpt"
 export CHECKPOINT_ENDPOINT=results_TCP.json
 export SCENARIOS=leaderboard/data/scenarios/all_towns_traffic_scenarios.json

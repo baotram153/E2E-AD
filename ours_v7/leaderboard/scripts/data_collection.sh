@@ -10,8 +10,8 @@ export PYTHONPATH=$PYTHONPATH:scenario_runner
 
 export LEADERBOARD_ROOT=leaderboard
 export CHALLENGE_TRACK_CODENAME=SENSORS
-export PORT=2012            #
-export TM_PORT=8012         #
+export PORT=2000            #
+export TM_PORT=8000         #
 export DEBUG_CHALLENGE=0
 export REPETITIONS=1        # multiple evaluation runs
 export RESUME=True
@@ -19,12 +19,12 @@ export DATA_COLLECTION=True
 
 
 # Roach data collection
-export ROUTES=leaderboard/data/TCP_training_routes/routes_town04_addition.xml     #
+export ROUTES=leaderboard/data/TCP_training_routes/routes_town01.xml     #
 export TEAM_AGENT=team_code/roach_ap_agent.py
 export TEAM_CONFIG=roach/config/config_agent.yaml
-export CHECKPOINT_ENDPOINT=2080/data_collect_town04_addition_results.json         #
-export SCENARIOS=leaderboard/data/scenarios/town04_all_scenarios.json             #
-export SAVE_PATH=/workspace/datasets/CARLA-data/data_collect_town04_addition/     #                          
+export CHECKPOINT_ENDPOINT=2080/data_collect_town01_results.json         #
+export SCENARIOS=leaderboard/data/scenarios/town01_all_scenarios.json             #
+export SAVE_PATH=/workspace/datasets/CARLA-bev-seg-data/data_collect_town01/     #                          
 
 
 

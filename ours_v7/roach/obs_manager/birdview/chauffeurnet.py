@@ -68,7 +68,7 @@ class ObsManager():
 			self._lane_marking_white_broken = np.array(hf['lane_marking_white_broken'], dtype=np.uint8)
 
 			self._world_offset = np.array(hf.attrs['world_offset_in_meters'], dtype=np.float32)
-			assert np.isclose(self._pixels_per_meter, float(hf.attrs['pixels_per_meter']))
+			# assert np.isclose(self._pixels_per_meter, float(hf.attrs['pixels_per_meter']))
 
 		self._distance_threshold = np.ceil(self._width / self._pixels_per_meter)
 
@@ -101,6 +101,7 @@ class ObsManager():
 
 		vehicle_bbox_list = self._world.get_level_bbs(carla.CityObjectLabel.Vehicles)
 		walker_bbox_list = self._world.get_level_bbs(carla.CityObjectLabel.Pedestrians)
+
 		if self._scale_bbox:
 			vehicles = self._get_surrounding_actors(vehicle_bbox_list, is_within_distance, 1.0)
 			walkers = self._get_surrounding_actors(walker_bbox_list, is_within_distance, 2.0)
@@ -138,7 +139,7 @@ class ObsManager():
 		# ev_mask
 		ev_mask = self._get_mask_from_actor_list([(ev_transform, ev_bbox.location, ev_bbox.extent)], M_warp)
 		ev_mask_col = self._get_mask_from_actor_list([(ev_transform, ev_bbox.location,
-													   ev_bbox.extent*self._scale_mask_col)], M_warp)
+													   ev_bbox.extent*self._scale_mask_col)], M_warp)	
 		# render
 		image = np.zeros([self._width, self._width, 3], dtype=np.uint8)
 		image[road_mask] = COLOR_ALUMINIUM_5
@@ -161,7 +162,7 @@ class ObsManager():
 		for i, mask in enumerate(walker_masks):
 			image[mask] = tint(COLOR_CYAN, (h_len-i)*0.2)
 
-		image[ev_mask] = COLOR_WHITE
+		image[ev_mask] = COLOR_WHITE	# ev
 		# image[obstacle_mask] = COLOR_BLUE
 
 		# masks
@@ -183,10 +184,22 @@ class ObsManager():
 		c_vehicle_history = [m*255 for m in vehicle_masks]
 		c_walker_history = [m*255 for m in walker_masks]
 
-		masks = np.stack((c_road, c_route, c_lane, *c_vehicle_history, *c_walker_history, *c_tl_history), axis=2)
+		masks = np.stack((c_road, c_route, c_lane, *c_vehicle_history, *c_walker_history, *c_tl_history), axis=2)	# 200, 200, 15
 		masks = np.transpose(masks, [2, 0, 1])
 
-		obs_dict = {'rendered': image, 'masks': masks}
+		veh_ped_mask = np.logical_or(vehicle_masks[-1], walker_masks[-1]).astype(int)
+
+		obs_dict = {'rendered': image, 'masks': masks, 'veh_ped_mask': veh_ped_mask}
+
+		# print(masks)
+		# print(masks[0])
+		# print(masks[0, 0])
+		# print(masks.shape)
+
+		# print(veh_ped_mask)
+		# print(veh_ped_mask.shape)
+		
+		# exit()
 
 		# self._parent_actor.collision_px = np.any(ev_mask_col & walker_masks[-1])
 
@@ -220,6 +233,10 @@ class ObsManager():
 		return mask.astype(np.bool)
 
 	def _get_mask_from_actor_list(self, actor_list, M_warp):
+		'''
+		M_warp: 
+		actor_list: each element includes carla.Transform(x, y)-of ev, bb_loc-of actor, bb_ext-of actor
+		'''
 		mask = np.zeros([self._width, self._width], dtype=np.uint8)
 		for actor_transform, bb_loc, bb_ext in actor_list:
 
@@ -243,7 +260,7 @@ class ObsManager():
 		for bbox in bbox_list:
 			is_within_distance = criterium(bbox)
 			if is_within_distance:
-				bb_loc = carla.Location()
+				bb_loc = carla.Location()	# doesn't specify any stpecific location? -> location of ego vehicle
 				bb_ext = carla.Vector3D(bbox.extent)
 				if scale is not None:
 					bb_ext = bb_ext * scale

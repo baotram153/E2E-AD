@@ -110,6 +110,7 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 			(self.save_path / 'measurements').mkdir()
 			(self.save_path / 'supervision').mkdir()
 			(self.save_path / 'bev').mkdir()
+			(self.save_path / 'bev_masks').mkdir()
 
 	def _init(self):
 		self._waypoint_planner = RoutePlanner(4.0, 50)
@@ -250,6 +251,7 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 		state_list.append(gear)
 		state_list.append(vel_xy)
 		state = np.concatenate(state_list)
+		
 		obs_dict = {
 			'state': state.astype(np.float32),
 			'birdview': birdview_obs['masks'],
@@ -272,18 +274,21 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 				'compass': compass,
 				'weather': weather,
 				}
+		
 		next_wp, next_cmd = self._route_planner.run_step(self._get_position(result))
 
 		result['next_command'] = next_cmd.value
 		result['x_target'] = next_wp[0]
 		result['y_target'] = next_wp[1]
 
+		bev_mask = birdview_obs['veh_ped_mask']
+
 		
-		return result, obs_dict, birdview_obs['rendered'], target_gps, target_command
+		return result, obs_dict, birdview_obs['rendered'], target_gps, target_command, bev_mask
 
 	def im_render(self, render_dict):
 		im_birdview = render_dict['rendered']
-		h, w, c = im_birdview.shape
+		h, w, c = im_birdview.shape		# 192, 192, 3 (width, width, 3)
 		im = np.zeros([h, w*2, c], dtype=np.uint8)
 		im[:h, :w] = im_birdview
 
@@ -296,8 +301,13 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 		debug_texts = [ 
 			'should_brake: ' + render_dict['should_brake'],
 		]
+
 		for i, txt in enumerate(debug_texts):
 			im = cv2.putText(im, txt, (w, (i+2)*12), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
+
+		# print(h, w, c)
+		# exit()
+		
 		return im
 
 	@torch.no_grad()
@@ -318,7 +328,10 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 
 		if self.step % 2 != 0:
 			return self.last_control
-		tick_data, policy_input, rendered, target_gps, target_command = self.tick(input_data, timestamp)
+		
+		# bev_mask is mask for only vehicles and pedestrians
+
+		tick_data, policy_input, rendered, target_gps, target_command, bev_mask = self.tick(input_data, timestamp)
 
 		gps = self._get_position(tick_data)
 
@@ -355,7 +368,7 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 			'only_ap_brake': only_ap_brake,
 		}
 		if SAVE_PATH is not None and self.step % 10 == 0:
-			self.save(near_node, far_node, near_command, far_command, tick_data, supervision_dict, render_img, should_brake)
+			self.save(near_node, far_node, near_command, far_command, tick_data, supervision_dict, render_img, should_brake, bev_mask)
 
 		steer = control.steer
 		control.steer = steer + 1e-2 * np.random.randn()
@@ -437,11 +450,13 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 
 		return None
 
-	def save(self, near_node, far_node, near_command, far_command, tick_data, supervision_dict, render_img, should_brake):
+	def save(self, near_node, far_node, near_command, far_command, tick_data, supervision_dict, render_img, should_brake, bev_mask):
 		frame = self.step // 10 - 2
 
 		Image.fromarray(tick_data['rgb']).save(self.save_path / 'rgb' / ('%04d.png' % frame))
 		Image.fromarray(render_img).save(self.save_path / 'bev' / ('%04d.png' % frame))
+
+
 		pos = self._get_position(tick_data)
 		theta = tick_data['compass']
 		speed = tick_data['speed']
@@ -465,8 +480,13 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 		outfile = open(self.save_path / 'measurements' / ('%04d.json' % frame), 'w')
 		json.dump(data, outfile, indent=4)
 		outfile.close()
+
 		with open(self.save_path / 'supervision' / ('%04d.npy' % frame), 'wb') as f:
 			np.save(f, supervision_dict)
+
+		# save bev masks
+		with open(self.save_path / 'bev_masks' / ('%04d.npy' % frame), 'wb') as f:
+			np.save(f, bev_mask)
 		
 			
 	def get_target_gps(self, gps, compass):

@@ -57,7 +57,10 @@ class TCP_planner(pl.LightningModule):
 
 		gt_waypoints = batch['waypoints']
 
-		pred = self.model(front_img, state, target_point)
+		post_tran = batch['post_tran']
+		post_rot = batch['post_rot']
+
+		pred = self.model(front_img, post_tran, post_rot, state, target_point)
 
 		dist_sup = Beta(batch['action_mu'], batch['action_sigma'])
 		dist_pred = Beta(pred['mu_branches'], pred['sigma_branches'])
@@ -105,7 +108,10 @@ class TCP_planner(pl.LightningModule):
 		feature = batch['feature']
 		gt_waypoints = batch['waypoints']
 
-		pred = self.model(front_img, state, target_point)
+		post_tran = batch['post_tran']
+		post_rot = batch['post_rot']
+
+		pred = self.model(front_img, post_tran, post_rot, state, target_point)
 		dist_sup = Beta(batch['action_mu'], batch['action_sigma'])
 		dist_pred = Beta(pred['mu_branches'], pred['sigma_branches'])
 		kl_div = torch.distributions.kl_divergence(dist_sup, dist_pred)

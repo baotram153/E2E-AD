@@ -134,6 +134,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 				]
 	
 	# waypoint is in local coord -> how to change it into global coord?
+	prev_rgb = None
 
 	def tick(self, input_data):
 		self.step += 1
@@ -144,11 +145,15 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		speed = input_data['speed'][1]['speed']
 		compass = input_data['imu'][1][-1]
 
+		if prev_rgb == None:
+			prev_rgb = rgb
+
 		if (math.isnan(compass) == True): #It can happen that the compass sends nan for a few frames
 			compass = 0.0
 
 		result = {
 				'rgb': rgb,
+				'prev_rgb': prev_rgb,
 				'gps': gps,
 				'speed': speed,
 				'compass': compass,
@@ -170,6 +175,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		local_command_point = np.array([next_wp[0]-pos[0], next_wp[1]-pos[1]])
 		local_command_point = R.T.dot(local_command_point)
 		result['target_point'] = tuple(local_command_point)
+		prev_rgb = rgb
 
 		return result
 
@@ -215,13 +221,16 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		speed = torch.FloatTensor([float(tick_data['speed'])]).view(1,1).to('cuda', dtype=torch.float32)
 		speed = speed / 12	# better normalization?
 		rgb = self._im_transform(tick_data['rgb']).unsqueeze(0).to('cuda', dtype=torch.float32)
+		prev_rgb = self._im_transform(tick_data['prev_rgb']).unsqueeze(0).to('cuda', dtype=torch.float32)
+
+		img_seq = torch.stack([rgb, prev_rgb], axis=1)
 
 		tick_data['target_point'] = [torch.FloatTensor([tick_data['target_point'][0]]),
 										torch.FloatTensor([tick_data['target_point'][1]])]
 		target_point = torch.stack(tick_data['target_point'], dim=1).to('cuda', dtype=torch.float32)
 		state = torch.cat([speed, target_point, cmd_one_hot], 1)
 
-		pred= self.net(rgb, state, target_point)
+		pred= self.net(rgb, img_seq, state, target_point)
 
 		throttle_ctrl, brake_ctrl, steer_ctrl, metadata_ctrl = self.net.process_action(pred, tick_data['next_command'], gt_velocity, target_point)
 
