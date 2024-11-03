@@ -130,11 +130,6 @@ class CARLA_Data(Dataset):
 		
 		data['front_img'] = img_transformed_norm
 
-		# data['front_img_PIL'] = Image.open(self.root + self.front_img[index][0])
-
-		# print(self.front_img[index])
-		# exit()
-
 		# if self.img_aug:
 		# 	data['front_img'] = self._im_transform(augmenter(self._batch_read_number).augment_image(np.array(
 		# 			Image.open(self.root+self.front_img[index][0]))))

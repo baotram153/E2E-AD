@@ -21,6 +21,8 @@ from TCP.model import TCP
 from TCP.config import GlobalConfig
 from team_code.planner import RoutePlanner
 
+from plugins.lift_splat_shoot.src.tools import img_transform, normalize_img
+
 
 SAVE_PATH = os.environ.get('SAVE_PATH', None)
 
@@ -64,7 +66,26 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		self.takeover_time = 0
 
 		self.save_path = None
-		self._im_transform = T.Compose([T.ToTensor(), T.Normalize(mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225])])
+		# self._im_transform = T.Compose([T.ToTensor(), T.Normalize(mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225])])
+
+		# LSS module
+		H=900
+		W=1600
+		final_dim=(128, 352)
+		bot_pct_lim=(0.0, 0.22)
+
+		# rots, trans, intrins, post_rots, post_trans
+		fH, fW = final_dim
+		resize = max(fH/H, fW/W)
+		resize_dims = (int(W*resize), int(H*resize))
+		newW, newH = resize_dims
+		crop_h = int((1 - np.mean(bot_pct_lim))*newH) - fH    # what if this is negative? -> padding, chấp nhận cắt phần dưới :v
+		crop_w = int(max(0, newW - fW) / 2)
+		self.crop = (crop_w, crop_h, crop_w + fW, crop_h + fH)
+		self.flip = False
+		self.rotate = 0
+		self.post_rot = torch.eye(2)
+		self.post_tran = torch.zeros(2)
 
 		self.last_steers = deque()
 		if SAVE_PATH is not None:
@@ -193,8 +214,23 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		if not self.initialized:
 			self._init()
 		tick_data = self.tick(input_data)
-		if self.step < self.config.seq_len:
-			rgb = self._im_transform(tick_data['rgb']).unsqueeze(0)
+		if self.step < self.config.seq_len:		# ??? save
+			# rgb = self._im_transform(tick_data['rgb']).unsqueeze(0)
+			img_transformed, post_rot2, post_tran2 = img_transform(tick_data['rgb'], self.post_rot, self.post_tran,
+												resize=self.resize,
+												resize_dims=self.resize_dims,
+												crop=self.crop,
+												flip=self.flip,
+												rotate=self.rotate,
+												)
+			# img_transformed_norm = normalize_img(img).unsqueeze(0)
+			img_transformed_norm = normalize_img(img_transformed).unsqueeze(0)
+			rgb = img_transformed_norm
+			
+			self.post_tran = torch.zeros(3)
+			self.post_rot = torch.eye(3)
+			self.post_tran[:2] = post_tran2
+			self.post_rot[:2, :2] = post_rot2
 
 			control = carla.VehicleControl()
 			control.steer = 0.0
@@ -214,14 +250,31 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		cmd_one_hot = torch.tensor(cmd_one_hot).view(1, 6).to('cuda', dtype=torch.float32)
 		speed = torch.FloatTensor([float(tick_data['speed'])]).view(1,1).to('cuda', dtype=torch.float32)
 		speed = speed / 12	# better normalization?
-		rgb = self._im_transform(tick_data['rgb']).unsqueeze(0).to('cuda', dtype=torch.float32)
+
+		# rgb = self._im_transform(tick_data['rgb']).unsqueeze(0).to('cuda', dtype=torch.float32)
+		img_transformed, post_rot2, post_tran2 = img_transform(tick_data['rgb'], self.post_rot, self.post_tran,
+												resize=self.resize,
+												resize_dims=self.resize_dims,
+												crop=self.crop,
+												flip=self.flip,
+												rotate=self.rotate,
+												)
+		# img_transformed_norm = normalize_img(img).unsqueeze(0)
+		img_transformed_norm = normalize_img(img_transformed).unsqueeze(0)
+		rgb = img_transformed_norm
+		
+		self.post_tran = torch.zeros(3)
+		self.post_rot = torch.eye(3)
+		self.post_tran[:2] = post_tran2
+		self.post_rot[:2, :2] = post_rot2
 
 		tick_data['target_point'] = [torch.FloatTensor([tick_data['target_point'][0]]),
 										torch.FloatTensor([tick_data['target_point'][1]])]
 		target_point = torch.stack(tick_data['target_point'], dim=1).to('cuda', dtype=torch.float32)
 		state = torch.cat([speed, target_point, cmd_one_hot], 1)
 
-		pred= self.net(rgb, state, target_point)
+		# pred= self.net(rgb, state, target_point)
+		pred = self.net(rgb, self.post_tran, self.post_rot, state, target_point)
 
 		throttle_ctrl, brake_ctrl, steer_ctrl, metadata_ctrl = self.net.process_action(pred, tick_data['next_command'], gt_velocity, target_point)
 
