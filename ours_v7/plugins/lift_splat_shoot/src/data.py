@@ -366,7 +366,7 @@ class CarlaData(torch.utils.data.Dataset):
         self.img_paths = []
         self.bev_masks = []
 
-        for route in os.listdir(self.root_dir):
+        for route in sorted(os.listdir(self.root_dir)):
             rgb_dir = os.path.join(self.root_dir, route, 'rgb')
             bev_dir = os.path.join(self.root_dir, route, 'bev_masks')
 
@@ -376,7 +376,8 @@ class CarlaData(torch.utils.data.Dataset):
 
             for i in range(len_route):
                 bev = np.load((str(bev_dir) + '/' + f"{i}".zfill(4) + f".npy"))
-                self.bev_masks.append(torch.from_numpy(bev.astype(np.float32)).unsqueeze(0))
+                # self.bev_masks.append(torch.from_numpy(bev.astype(np.float32)).unsqueeze(0))
+                self.bev_masks.append(bev.astype(np.float32))
 
         self.data_aug_conf = data_aug_conf
         self.grid_conf = grid_conf
@@ -384,6 +385,7 @@ class CarlaData(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.img_paths)
+        # return 10
     
     def __getitem__(self, index):
         imgs, rots, trans, intrins, post_rots, post_trans = self.get_image_data(self.img_paths[index])
@@ -496,14 +498,14 @@ class CarlaDataTrain(CarlaData):
         self.img_paths = self.img_paths[:self.len_train]
         self.bev_masks = self.bev_masks[:self.len_train]
 
-        # print("In carla data train:")
-        # print(len(self.img_paths))
-        # print(self.img_paths[0])
-        # print(len(self.bev_masks))
-        # cv2.imwrite("train_bev.png", self.bev_masks[0]*255)
-        # img = cv2.imread(self.img_paths[0])
-        # cv2.imwrite("train.png", img)
-        # print(self.bev_masks[0])
+        print("In carla data train:")
+        print(len(self.img_paths))
+        print(self.img_paths[0])
+        print(len(self.bev_masks))
+        print(self.bev_masks[3].shape)
+        cv2.imwrite("train_bev.png", self.bev_masks[3]*255)
+        img = cv2.imread(self.img_paths[3])
+        cv2.imwrite("train.png", img)
 
 class CarlaDataVal(CarlaData):
     def __init__(self, root_dir, data_aug_conf, grid_conf):
@@ -511,14 +513,15 @@ class CarlaDataVal(CarlaData):
         self.img_paths = self.img_paths[self.len_train:]
         self.bev_masks = self.bev_masks[self.len_train:]
 
-        # print("In carla data val:")
-        # print(len(self.img_paths))
-        # print(self.img_paths[0])
-        # cv2.imwrite("val_bev.png", self.bev_masks[0]*255)
-        # img = cv2.imread(self.img_paths[0])
-        # cv2.imwrite("val.png", img)
+        print("In carla data val:")
+        print(len(self.img_paths))
+        print(self.img_paths[0])
+        print(self.bev_masks[3].shape)
+        cv2.imwrite("val_bev.png", self.bev_masks[3]*255)
+        img = cv2.imread(self.img_paths[3])
+        cv2.imwrite("val.png", img)
 
-        # exit()
+        exit()
 
 
 def worker_rnd_init(x):
@@ -531,9 +534,9 @@ def compile_data(version, data_folder, data_aug_conf, grid_conf, bsz,
     #                 dataroot=os.path.join(dataroot, version),
     #                 verbose=False)
 
-    # try 1 data folder
-    data = np.load(os.path.join(data_folder, "packed_data.npy"), allow_pickle=True).item()
-    front_imgs = [img_pair[0] for img_pair in data["front_img"]] 
+    ## try 1 data folder
+    # data = np.load(os.path.join(data_folder, "packed_data.npy"), allow_pickle=True).item()
+    # front_imgs = [img_pair[0] for img_pair in data["front_img"]] 
 
     # print(front_imgs)
 

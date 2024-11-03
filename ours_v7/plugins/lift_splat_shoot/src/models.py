@@ -8,6 +8,7 @@ import torch
 from torch import nn
 from efficientnet_pytorch import EfficientNet
 from torchvision.models.resnet import resnet18
+from torchvision.transforms import Resize
 
 from .tools import gen_dx_bx, cumsum_trick, QuickCumsum
 
@@ -157,7 +158,7 @@ class LiftSplatShoot(nn.Module):
     
     def create_frustum(self):
         # make grid in image plane
-        ogfH, ogfW = self.data_aug_conf['final_dim']
+        ogfH, ogfW = self.data_aug_conf['final_dim'] # LSS image size? (128, 352) -> (256, 928)
         fH, fW = ogfH // self.downsample, ogfW // self.downsample
         ds = torch.arange(*self.grid_conf['dbound'], dtype=torch.float).view(-1, 1, 1).expand(-1, fH, fW)
         D, _, _ = ds.shape
@@ -168,16 +169,26 @@ class LiftSplatShoot(nn.Module):
         frustum = torch.stack((xs, ys, ds), -1)
         return nn.Parameter(frustum, requires_grad=False)
 
-    def get_geometry(self, rots, trans, intrins, post_rots, post_trans):
+    def get_geometry(self, rots, trans, intrins, post_rots, post_trans): 
         """Determine the (x,y,z) locations (in the ego frame)
         of the points in the point cloud.
         Returns B x N x D x H/downsample x W/downsample x 3
         """
         # where's the downsample part?
-        B, N, _ = trans.shape   # why predict for pixel in each channel instead of just 1?
+        # print(post_trans.shape)
+        # exit()
+        B, N, _ = post_trans.shape   # why predict for pixel in each channel instead of just 1?
+        # B, N = 32, 1
 
         # undo post-transformation
         # B x N x D x H x W x 3
+        # print('------>')
+        # print('self.frustum.shape', self.frustum.shape)
+        # print('rots.shape', rots.shape)
+        # print('trans.shape', trans.shape)
+        # print('intrins.shape', intrins.shape)
+        # print('post_rots.shape', post_rots.shape)
+        # print('post_trans.shape', post_trans.shape)
         points = self.frustum - post_trans.view(B, N, 1, 1, 1, 3)
         points = torch.inverse(post_rots).view(B, N, 1, 1, 1, 3, 3).matmul(points.unsqueeze(-1))
 
@@ -186,15 +197,27 @@ class LiftSplatShoot(nn.Module):
                             points[:, :, :, :, :, 2:3]
                             ), 5)
 
-        combine = rots.matmul(torch.inverse(intrins))
-        points = combine.view(B, N, 1, 1, 1, 3, 3).matmul(points).squeeze(-1)
-        points += trans.view(B, N, 1, 1, 1, 3)
+        combine = rots.matmul(torch.inverse(intrins)).to(points.device) # bug: different device
+        # print('combine.shape', combine.shape)
+        # points = combine.view(B=32, N=1, 1, 1, 1, 3, 3).matmul(points).squeeze(-1)
+        # print('points.shape', points.shape)
+        points = combine @ points # broad cast [32, 1, 41, 8, 22,3,3], points [32, 1, 41, 8, 22, 3, 1]-> [32, 1, 41, 8, 22, 3, 1] (n,m) @ (m,p) = (n,p)
+        # print('points.shape', points.shape)
+        points = points.squeeze(-1)
+        # print('points.shape squeeze', points.shape)
+        # points += trans.to(points.device).view(B, N, 1, 1, 1, 3) # bug: different device
+        points += trans.to(points.device) # support broadcast [1, 3] + [32, 1, 41, 8, 22, 3] = [32, 1, 41, 8, 22, 3]
+        # print('points.shape + trans', points.shape)
 
         return points
 
     def get_cam_feats(self, x):
         """Return B x N x D x H/downsample x W/downsample x C
         """
+        # B, N, C, imH, imW = x.shape
+        # x = Resize((128, 352))(x[:,0,:,:,:]).unsqueeze(1) # since 928 /2^5 = 29
+        # x = Resize((256, 928))(x[:,0,:,:,:]).unsqueeze(1) # since 928 /2^5 = 29
+        # (256, 900) /
         B, N, C, imH, imW = x.shape
 
         x = x.view(B*N, C, imH, imW)
@@ -205,8 +228,8 @@ class LiftSplatShoot(nn.Module):
         return x
 
     def voxel_pooling(self, geom_feats, x):
-        B, N, D, H, W, C = x.shape
-        Nprime = B*N*D*H*W
+        B, N, D, H, W, C = x.shape # 32,1,1,256//16, 928//16
+        Nprime = B*N*D*H*W # 256//16,928 //16
 
         # flatten x
         x = x.reshape(Nprime, C)

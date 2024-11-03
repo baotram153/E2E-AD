@@ -44,10 +44,21 @@ training:
     update_adv: false
     lr_schedule_step: 8
 obs_configs:
+  birdview_seg_data:
+    width_in_pixels: 200
+    pixels_ev_to_bottom: 100
+    pixels_per_meter: 5.0
+    history_idx:
+    - -16
+    - -11
+    - -6
+    - -1
+    scale_bbox: true
+    scale_mask_col: 1.0
   birdview:
     module: birdview.chauffeurnet
-    width_in_pixels: 200    # 192
-    pixels_ev_to_bottom: 100   # 40
+    width_in_pixels: 192    # 192
+    pixels_ev_to_bottom: 40   # 40
     pixels_per_meter: 5.0     # 5
     history_idx:
     - -16

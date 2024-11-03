@@ -84,6 +84,7 @@ class CARLA_Data(Dataset):
 	def __len__(self):
 		"""Returns the length of the dataset. """
 		return len(self.front_img)
+		# return 63
 
 	def __getitem__(self, index):
 		"""Returns the item at index idx. """
@@ -94,41 +95,8 @@ class CARLA_Data(Dataset):
 		# LSS module
 		H=900
 		W=1600
-		resize_lim=(0.193, 0.225)
 		final_dim=(128, 352)
 		bot_pct_lim=(0.0, 0.22)
-		rot_lim=(-5.4, 5.4)
-		rand_flip=True
-		ncams=5
-		max_grad_norm=5.0
-		pos_weight=2.13
-
-		lss_ckpt_path='plugins/lift_splat_shoot/runs/model90000.pt'
-
-		xbound=[-50.0, 50.0, 0.5]
-		ybound=[-50.0, 50.0, 0.5]
-		zbound=[-10.0, 10.0, 20.0]
-		dbound=[4.0, 45.0, 1.0]
-
-		grid_conf = grid_conf = {
-			'xbound': xbound,
-			'ybound': ybound,
-			'zbound': zbound,
-			'dbound': dbound,
-		}
-
-		data_aug_conf = {
-						'resize_lim': resize_lim,
-						'final_dim': final_dim,
-						'rot_lim': rot_lim,
-						'H': H, 'W': W,
-						'rand_flip': rand_flip,
-						'bot_pct_lim': bot_pct_lim,
-						'cams': ['CAM_FRONT_LEFT', 'CAM_FRONT', 'CAM_FRONT_RIGHT',
-								'CAM_BACK_LEFT', 'CAM_BACK', 'CAM_BACK_RIGHT'],
-						'Ncams': ncams,
-		}
-		outC = 1
 
 		# rots, trans, intrins, post_rots, post_trans
 		fH, fW = final_dim
@@ -149,7 +117,9 @@ class CARLA_Data(Dataset):
 												flip=flip,
 												rotate=rotate,
 												)
-		img_transformed_norm = normalize_img(img).unsqueeze(0)
+		# img_transformed_norm = normalize_img(img).unsqueeze(0)
+		img_transformed_norm = normalize_img(img_transformed).unsqueeze(0)
+		
 		post_tran = torch.zeros(3)
 		post_rot = torch.eye(3)
 		post_tran[:2] = post_tran2

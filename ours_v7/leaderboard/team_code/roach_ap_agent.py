@@ -15,7 +15,7 @@ import numpy as np
 from omegaconf import OmegaConf
 
 from roach.criteria import run_stop_sign
-from roach.obs_manager.birdview.chauffeurnet import ObsManager
+from roach.obs_manager.birdview.chauffeurnet import ObsManager, ObsManagerSegData
 from roach.utils.config_utils import load_entry_point
 import roach.utils.transforms as trans_utils
 from roach.utils.traffic_light import TrafficLightHandler
@@ -128,7 +128,10 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 		self._last_route_location = self._ego_vehicle.get_location()
 		self._criteria_stop = run_stop_sign.RunStopSign(self._world)
 		self.birdview_obs_manager = ObsManager(self.cfg['obs_configs']['birdview'], self._criteria_stop)
+		self.birdview_seg_data_manager = ObsManagerSegData(self.cfg['obs_configs']['birdview_seg_data'], self._criteria_stop)
+
 		self.birdview_obs_manager.attach_ego_vehicle(self._ego_vehicle)
+		self.birdview_seg_data_manager.attach_ego_vehicle(self._ego_vehicle)
 
 		self.navigation_idx = -1
 
@@ -229,6 +232,8 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 		self._truncate_global_route_till_local_target()
 
 		birdview_obs = self.birdview_obs_manager.get_observation(self._global_route)
+		birdview_obs_seg = self.birdview_seg_data_manager.get_observation(self._global_route)
+
 		control = self._ego_vehicle.get_control()
 		throttle = np.array([control.throttle], dtype=np.float32)
 		steer = np.array([control.steer], dtype=np.float32)
@@ -254,7 +259,7 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 		
 		obs_dict = {
 			'state': state.astype(np.float32),
-			'birdview': birdview_obs['masks'],
+			'birdview': birdview_obs['masks'],	# switch to bev segmentation
 		}
 
 		rgb = cv2.cvtColor(input_data['rgb'][1][:, :, :3], cv2.COLOR_BGR2RGB)
@@ -281,7 +286,7 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 		result['x_target'] = next_wp[0]
 		result['y_target'] = next_wp[1]
 
-		bev_mask = birdview_obs['veh_ped_mask']
+		bev_mask = birdview_obs_seg['veh_ped_mask']
 
 		
 		return result, obs_dict, birdview_obs['rendered'], target_gps, target_command, bev_mask

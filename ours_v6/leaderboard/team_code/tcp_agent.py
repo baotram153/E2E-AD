@@ -176,6 +176,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		local_command_point = R.T.dot(local_command_point)
 		result['target_point'] = tuple(local_command_point)
 		prev_rgb = rgb
+		
 
 		return result
 

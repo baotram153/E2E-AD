@@ -7,6 +7,7 @@ from TCP.transformer import *
 from plugins.lift_splat_shoot.src.models import compile_model
 from plugins.lift_splat_shoot.src.tools import img_transform, normalize_img
 import copy
+from torchvision.transforms import Resize
 
 
 
@@ -48,6 +49,17 @@ class TCP(nn.Module):
 		# process lss module
 		self.lss_module = compile_model(config.grid_conf, config.data_aug_conf, config.outC)
 		self.lss_module.load_state_dict(torch.load(config.lss_ckpt_path))
+		for params in self.lss_module.parameters():
+			params.requires_grad = False
+
+		for params in self.lss_module.bevencode.layer3.parameters():
+			params.requires_grad = True
+		# print(self.lss_module)
+		# exit()
+
+		self.bev_encoder = nn.Sequential(
+			nn.AdaptiveAvgPool2d((1, 1)),
+		)
 
 		self.measurements = nn.Sequential(	
 							nn.Linear(1+2+6, 256),
@@ -57,7 +69,7 @@ class TCP(nn.Module):
 						)
 
 		self.join_traj = nn.Sequential(
-							nn.Linear(256+1000, 512),
+							nn.Linear(256+256+1000, 512),
 							nn.ReLU(inplace=True),
 							nn.Linear(512, 512),
 							nn.ReLU(inplace=True),
@@ -117,6 +129,7 @@ class TCP(nn.Module):
 		# 		nn.Linear(256, 256),
 		# 		nn.ReLU(inplace=True),
 		# 	)
+
 		self.dist_mu = nn.Sequential(nn.Linear(256, dim_out), nn.Softplus())
 		self.dist_sigma = nn.Sequential(nn.Linear(256, dim_out), nn.Softplus())
 
@@ -149,7 +162,8 @@ class TCP(nn.Module):
 		decoder_layer = nn.TransformerDecoderLayer(d_model=256, nhead=8, batch_first=True)
 		self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=6)
 
-		self.increase_dim = nn.Linear(8*29, 256)
+		# self.increase_dim = nn.Linear(8*29, 256)	# 56/2^5, 900/2^5 (/2 5 times, round up)
+		self.increase_dim = nn.Linear(4*11, 256) 	# 8, 29 ??? 256/2^5, 928/2^5 => 128, 352
 
 		self.decrease_dim = nn.Sequential(	
 			nn.Linear(256*5, 512),
@@ -159,30 +173,39 @@ class TCP(nn.Module):
 		)
 
 	def forward(self, img, post_tran, post_rot, state, target_point):
-		# bev branch
+		# img.shape: 32, 1, 3, 256, 900
+		
+		'''bev branch'''
+
+		# print(post_rot.shape)
+		# print(post_tran.shape)
+		# exit()
+
+		
 		
 		# for convenience, make augmentation matrices 3x3
 		rots = self.config.rotation.unsqueeze(0).unsqueeze(0)
 		trans = self.config.translation.unsqueeze(0).unsqueeze(0)
 		intrins = self.config.intrinsic.unsqueeze(0).unsqueeze(0)
-		post_rots = post_rot.unsqueeze(0)
-		post_trans = post_tran.unsqueeze(0)
+		post_rots = post_rot.unsqueeze(1)
+		post_trans = post_tran.unsqueeze(1)
 
-		# print(rots.shape)
-		# print(trans.shape)
-		# exit()
+		bev_seg = self.lss_module(img, rots, trans, intrins, post_rots, post_trans)		# B, C, W, H = 32, 256, 25, 25	
+		bev_emb = self.bev_encoder(bev_seg).squeeze()		# (B, 256, 1, 1) -> (B, 256)
 
-		bev_seg = self.lss_module(img, rots, trans, intrins, post_rots, post_trans)
-		print(bev_seg.shape)
-		exit()
+		'''rgb encoder branch'''
 
-		# rgb encoder branch
-		feature_emb, cnn_feature = self.perception(img)
+		# TODO: add augmentation
+		img = Resize((128, 352))(img[:,0,:,:,:]) # B, C, H, W
+		feature_emb, cnn_feature = self.perception(img) # 
 		outputs = {}
 		outputs['pred_speed'] = self.speed_branch(feature_emb)
 		measurement_feature = self.measurements(state)
+
+		# print(feature_emb.shape)
+		# print(bev_emb.shape)
 		
-		j_traj = self.join_traj(torch.cat([feature_emb, measurement_feature], 1))
+		j_traj = self.join_traj(torch.cat([feature_emb, bev_emb, measurement_feature], 1))
 		outputs['pred_value_traj'] = self.value_branch_traj(j_traj)
 		outputs['pred_features_traj'] = j_traj
 		z = j_traj
@@ -222,6 +245,7 @@ class TCP(nn.Module):
 		
 		_ , n_channels, height, width = cnn_feature.shape
 		memory =  cnn_feature.view(-1, n_channels, height*width)	# key, value
+
 		memory_256 = self.increase_dim(memory)
 
 		out = self.transformer_decoder(tgt, memory_256)		# output dim: tgt

@@ -80,6 +80,7 @@ class TCP_planner(pl.LightningModule):
 		# 	future_feature_loss += F.mse_loss(pred['future_feature'][i], batch['future_feature'][i]) * self.config.features_weight
 		# future_feature_loss /= self.config.pred_len
 		# future_action_loss /= self.config.pred_len
+		
 		wp_loss = F.l1_loss(pred['pred_wp'], gt_waypoints, reduction='none').mean()
 		loss = action_loss + speed_loss + value_loss + feature_loss + wp_loss
 
