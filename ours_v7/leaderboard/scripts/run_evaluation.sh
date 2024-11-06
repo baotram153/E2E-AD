@@ -12,8 +12,8 @@ export PYTHONPATH=$PYTHONPATH:scenario_runner
 
 export LEADERBOARD_ROOT=leaderboard
 export CHALLENGE_TRACK_CODENAME=SENSORS
-export PORT=2004
-export TM_PORT=8004
+export PORT=2000
+export TM_PORT=8000
 export DEBUG_CHALLENGE=0
 export REPETITIONS=3 # multiple evaluation runs
 export RESUME=True

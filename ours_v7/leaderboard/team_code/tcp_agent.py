@@ -76,9 +76,9 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 
 		# rots, trans, intrins, post_rots, post_trans
 		fH, fW = final_dim
-		resize = max(fH/H, fW/W)
-		resize_dims = (int(W*resize), int(H*resize))
-		newW, newH = resize_dims
+		self.resize = max(fH/H, fW/W)
+		self.resize_dims = (int(W*self.resize), int(H*self.resize))
+		newW, newH = self.resize_dims
 		crop_h = int((1 - np.mean(bot_pct_lim))*newH) - fH    # what if this is negative? -> padding, chấp nhận cắt phần dưới :v
 		crop_w = int(max(0, newW - fW) / 2)
 		self.crop = (crop_w, crop_h, crop_w + fW, crop_h + fH)
@@ -214,9 +214,16 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		if not self.initialized:
 			self._init()
 		tick_data = self.tick(input_data)
+
+		# print(tick_data['rgb'].shape)
+		# print(type(tick_data['rgb']))
+		# exit()
+
+		rgb = Image.fromarray(tick_data['rgb'])
+
 		if self.step < self.config.seq_len:		# ??? save
 			# rgb = self._im_transform(tick_data['rgb']).unsqueeze(0)
-			img_transformed, post_rot2, post_tran2 = img_transform(tick_data['rgb'], self.post_rot, self.post_tran,
+			img_transformed, post_rot2, post_tran2 = img_transform(rgb, self.post_rot, self.post_tran,
 												resize=self.resize,
 												resize_dims=self.resize_dims,
 												crop=self.crop,
@@ -225,12 +232,17 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 												)
 			# img_transformed_norm = normalize_img(img).unsqueeze(0)
 			img_transformed_norm = normalize_img(img_transformed).unsqueeze(0)
-			rgb = img_transformed_norm
+			rgb = img_transformed_norm.unsqueeze(0).to('cuda', dtype=torch.float32)
+			# print(rgb.shape)
+			# exit()
 			
-			self.post_tran = torch.zeros(3)
-			self.post_rot = torch.eye(3)
-			self.post_tran[:2] = post_tran2
-			self.post_rot[:2, :2] = post_rot2
+			post_tran = torch.zeros(3)
+			post_rot = torch.eye(3)
+			post_tran[:2] = post_tran2
+			post_rot[:2, :2] = post_rot2
+
+			post_rots = post_rot.unsqueeze(0).to('cuda', dtype=torch.float32)	# add batch dim
+			post_trans = post_tran.unsqueeze(0).to('cuda', dtype=torch.float32)
 
 			control = carla.VehicleControl()
 			control.steer = 0.0
@@ -252,7 +264,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		speed = speed / 12	# better normalization?
 
 		# rgb = self._im_transform(tick_data['rgb']).unsqueeze(0).to('cuda', dtype=torch.float32)
-		img_transformed, post_rot2, post_tran2 = img_transform(tick_data['rgb'], self.post_rot, self.post_tran,
+		img_transformed, post_rot2, post_tran2 = img_transform(rgb, self.post_rot, self.post_tran,
 												resize=self.resize,
 												resize_dims=self.resize_dims,
 												crop=self.crop,
@@ -261,12 +273,14 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 												)
 		# img_transformed_norm = normalize_img(img).unsqueeze(0)
 		img_transformed_norm = normalize_img(img_transformed).unsqueeze(0)
-		rgb = img_transformed_norm
+		rgb = img_transformed_norm.unsqueeze(0).to('cuda', dtype=torch.float32)
 		
-		self.post_tran = torch.zeros(3)
-		self.post_rot = torch.eye(3)
-		self.post_tran[:2] = post_tran2
-		self.post_rot[:2, :2] = post_rot2
+		post_tran = torch.zeros(3)
+		post_rot = torch.eye(3)
+		post_tran[:2] = post_tran2
+		post_rot[:2, :2] = post_rot2
+		post_rots = post_rot.unsqueeze(0).to('cuda', dtype=torch.float32)	# add batch dim
+		post_trans = post_tran.unsqueeze(0).to('cuda', dtype=torch.float32)
 
 		tick_data['target_point'] = [torch.FloatTensor([tick_data['target_point'][0]]),
 										torch.FloatTensor([tick_data['target_point'][1]])]
@@ -274,7 +288,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		state = torch.cat([speed, target_point, cmd_one_hot], 1)
 
 		# pred= self.net(rgb, state, target_point)
-		pred = self.net(rgb, self.post_tran, self.post_rot, state, target_point)
+		pred = self.net(rgb, post_trans, post_rots, state, target_point)
 
 		throttle_ctrl, brake_ctrl, steer_ctrl, metadata_ctrl = self.net.process_action(pred, tick_data['next_command'], gt_velocity, target_point)
 

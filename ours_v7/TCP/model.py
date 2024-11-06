@@ -191,7 +191,7 @@ class TCP(nn.Module):
 		post_trans = post_tran.unsqueeze(1)
 
 		bev_seg = self.lss_module(img, rots, trans, intrins, post_rots, post_trans)		# B, C, W, H = 32, 256, 25, 25	
-		bev_emb = self.bev_encoder(bev_seg).squeeze()		# (B, 256, 1, 1) -> (B, 256)
+		bev_emb = self.bev_encoder(bev_seg).squeeze().unsqueeze(0)		# (B, 256, 1, 1) -> (B, 256)
 
 		'''rgb encoder branch'''
 
@@ -204,8 +204,11 @@ class TCP(nn.Module):
 
 		# print(feature_emb.shape)
 		# print(bev_emb.shape)
+		# print(measurement_feature.shape)
+		# exit()
 		
 		j_traj = self.join_traj(torch.cat([feature_emb, bev_emb, measurement_feature], 1))
+
 		outputs['pred_value_traj'] = self.value_branch_traj(j_traj)
 		outputs['pred_features_traj'] = j_traj
 		z = j_traj
