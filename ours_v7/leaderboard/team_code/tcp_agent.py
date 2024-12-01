@@ -233,8 +233,6 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 			# img_transformed_norm = normalize_img(img).unsqueeze(0)
 			img_transformed_norm = normalize_img(img_transformed).unsqueeze(0)
 			rgb = img_transformed_norm.unsqueeze(0).to('cuda', dtype=torch.float32)
-			# print(rgb.shape)
-			# exit()
 			
 			post_tran = torch.zeros(3)
 			post_rot = torch.eye(3)
@@ -271,6 +269,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 												flip=self.flip,
 												rotate=self.rotate,
 												)
+		
 		# img_transformed_norm = normalize_img(img).unsqueeze(0)
 		img_transformed_norm = normalize_img(img_transformed).unsqueeze(0)
 		rgb = img_transformed_norm.unsqueeze(0).to('cuda', dtype=torch.float32)
