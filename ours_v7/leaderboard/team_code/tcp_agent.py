@@ -84,8 +84,6 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		self.crop = (crop_w, crop_h, crop_w + fW, crop_h + fH)
 		self.flip = False
 		self.rotate = 0
-		self.post_rot = torch.eye(2)
-		self.post_tran = torch.zeros(2)
 
 		self.last_steers = deque()
 		if SAVE_PATH is not None:
@@ -220,10 +218,12 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		# exit()
 
 		rgb = Image.fromarray(tick_data['rgb'])
+		post_rot = torch.eye(2)
+		post_tran = torch.zeros(2)
 
 		if self.step < self.config.seq_len:		# ??? save
 			# rgb = self._im_transform(tick_data['rgb']).unsqueeze(0)
-			img_transformed, post_rot2, post_tran2 = img_transform(rgb, self.post_rot, self.post_tran,
+			img_transformed, post_rot2, post_tran2 = img_transform(rgb, post_rot, post_tran,
 												resize=self.resize,
 												resize_dims=self.resize_dims,
 												crop=self.crop,
@@ -264,7 +264,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		speed = speed / 12	# better normalization?
 
 		# rgb = self._im_transform(tick_data['rgb']).unsqueeze(0).to('cuda', dtype=torch.float32)
-		img_transformed, post_rot2, post_tran2 = img_transform(rgb, self.post_rot, self.post_tran,
+		img_transformed, post_rot2, post_tran2 = img_transform(rgb, post_rot, post_tran,
 												resize=self.resize,
 												resize_dims=self.resize_dims,
 												crop=self.crop,

@@ -182,17 +182,16 @@ class LiftSplatShoot(nn.Module):
 
         # undo post-transformation
         # B x N x D x H x W x 3
-        print('------>')
-        print('self.frustum.shape', self.frustum.shape)
-        print('rots.shape', rots.shape)
-        print('trans.shape', trans.shape)
-        print('intrins.shape', intrins.shape)
-        print('post_rots.shape', post_rots.shape)
-        print('post_trans.shape', post_trans.shape)
-        print('post_rots', post_rots)
+        # print('------>')
+        # print('self.frustum.shape', self.frustum.shape)
+        # print('rots.shape', rots.shape)
+        # print('trans.shape', trans.shape)
+        # print('intrins.shape', intrins.shape)
+        # print('post_rots.shape', post_rots.shape)
+        # print('post_trans.shape', post_trans.shape)
+        
         points = self.frustum - post_trans.view(B, N, 1, 1, 1, 3)
-        print(points.shape)
-        exit()
+        # print(points.shape)
         points = torch.inverse(post_rots).view(B, N, 1, 1, 1, 3, 3).matmul(points.unsqueeze(-1))
 
         # cam_to_ego
