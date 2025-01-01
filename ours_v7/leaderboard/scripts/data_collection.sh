@@ -19,12 +19,12 @@ export DATA_COLLECTION=True
 
 
 # Roach data collection
-export ROUTES=leaderboard/data/TCP_training_routes/routes_town03.xml     #
+export ROUTES=leaderboard/data/TCP_training_routes/routes_town04.xml     #
 export TEAM_AGENT=team_code/roach_ap_agent.py
 export TEAM_CONFIG=roach/config/config_agent.yaml
-export CHECKPOINT_ENDPOINT=2080/data_collect_town03_results.json         #
-export SCENARIOS=leaderboard/data/scenarios/town03_all_scenarios.json             #
-export SAVE_PATH=/workspace/datasets/CARLA-bev-seg-data/data_collect_town03/     #                          
+export CHECKPOINT_ENDPOINT=2080/data_collect_town04_results.json         #
+export SCENARIOS=leaderboard/data/scenarios/town04_all_scenarios.json             #
+export SAVE_PATH=/workspace/datasets/CARLA-bev-seg-data/data_collect_town04/     #                          
 
 
 

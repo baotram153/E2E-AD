@@ -1,11 +1,125 @@
 {
     "_checkpoint": {
         "global_record": {},
-        "progress": [],
-        "records": []
+        "progress": [
+            4,
+            300
+        ],
+        "records": [
+            {
+                "index": 0,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 37.85000056400895,
+                    "duration_system": 65.35880708694458,
+                    "route_length": 18.120467754320643,
+                    "total_steps": 756
+                },
+                "route_id": "RouteScenario_0",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 1,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 43.900000654160976,
+                    "duration_system": 82.93883609771729,
+                    "route_length": 98.30667492799745,
+                    "total_steps": 877
+                },
+                "route_id": "RouteScenario_1",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 2,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 24.350000362843275,
+                    "duration_system": 40.339306354522705,
+                    "route_length": 37.61068420336111,
+                    "total_steps": 486
+                },
+                "route_id": "RouteScenario_2",
+                "scores": {
+                    "score_composed": 100.0,
+                    "score_penalty": 1.0,
+                    "score_route": 100.0
+                },
+                "status": "Completed"
+            },
+            {
+                "index": 3,
+                "infractions": {
+                    "collisions_layout": [],
+                    "collisions_pedestrian": [],
+                    "collisions_vehicle": [],
+                    "outside_route_lanes": [],
+                    "red_light": [],
+                    "route_dev": [],
+                    "route_timeout": [
+                        "Route timeout."
+                    ],
+                    "stop_infraction": [],
+                    "vehicle_blocked": []
+                },
+                "meta": {
+                    "duration_game": 239.05000356212258,
+                    "duration_system": 413.6245310306549,
+                    "route_length": 239.55438331427405,
+                    "total_steps": 4780
+                },
+                "route_id": "RouteScenario_3",
+                "scores": {
+                    "score_composed": 98.59188321496818,
+                    "score_penalty": 1.0,
+                    "score_route": 98.59188321496818
+                },
+                "status": "Failed - Agent timed out"
+            }
+        ]
     },
-    "eligible": "",
-    "entry_status": "",
+    "eligible": false,
+    "entry_status": "Started",
     "labels": [],
     "sensors": [
         "carla_camera",
