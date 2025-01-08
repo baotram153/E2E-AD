@@ -145,6 +145,7 @@ class ScenarioManager(object):
             self._timestamp_last_run = timestamp.elapsed_seconds
 
             self._watchdog.update()
+            
             # Update game time and actor information
             GameTime.on_carla_tick(timestamp)
             CarlaDataProvider.on_carla_tick()

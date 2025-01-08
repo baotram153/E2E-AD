@@ -86,9 +86,10 @@ def _get_latlon_ref(world):
 def downsample_route(route, sample_factor):
     """
     Downsample the route by some factor.
-    :param route: the trajectory , has to contain the waypoints and the road options
+    :param route: the trajectory , has to contain the waypoints and the road options (command: CHANGELANELEFT, CHANGELANERIGHT, etc)
     :param sample_factor: Maximum distance between samples
-    :return: returns the ids of the final route that can
+    :return: returns the ids of the final route (get rid of unnecessary wps) so that it:
+        - only contains wps whose option changes, or doing lane changes, or after a certain distance
     """
 
     ids_to_sample = []

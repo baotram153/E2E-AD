@@ -33,12 +33,12 @@ def get_entry_point():
 class TCPAgent(autonomous_agent.AutonomousAgent):
 	def setup(self, path_to_conf_file):
 		self.track = autonomous_agent.Track.SENSORS
-		self.alpha = 0	# this is important
-		self.status = 1
-		self.steer_step = 0
-		self.last_moving_status = 0
-		self.last_moving_step = -1
-		self.last_steers = deque()
+		self.alpha = 0			# ratio between traj and ctrl
+		self.status = 1			# log the branch used: 0 for traj, 1 for ctrl
+		self.steer_step = 0		# number of steps that the ego is turning
+		self.last_moving_status = 0		# //
+		self.last_moving_step = -1		# //
+		self.last_steers = deque()		# store the last 20 steers
 
 		self.config_path = path_to_conf_file
 		self.step = -1
@@ -167,6 +167,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 			[np.sin(theta), np.cos(theta)]
 			])
 
+		# target_point is actually delta between next_wp and current pos of ev
 		local_command_point = np.array([next_wp[0]-pos[0], next_wp[1]-pos[1]])
 		local_command_point = R.T.dot(local_command_point)
 		result['target_point'] = tuple(local_command_point)
@@ -174,6 +175,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		return result
 
 	def draw_wps (self, img, wps_dict, frame, r=1):
+		'''Need to find pixels / meter'''
 		draw = ImageDraw.Draw(img)
 		for idx in range (n_wps):
 			wp_delta = np.array(wps_dict['wp_{}'.format(idx + 1)])	
@@ -184,8 +186,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 			wp_global = pos + wp_delta*10.	# ?
 			top_left = (wp_global[0] - r, wp_global[1] - r)		# top left
 			bottom_right = (wp_global[0] + r, wp_global[1] + r)
-			two_pts = [top_left, bottom_right]
-			draw.ellipse(xy=two_pts, fill=(255, 0, 0, 255))		# RGBA
+			draw.ellipse(xy=[top_left, bottom_right], fill=(255, 0, 0, 255))		# RGBA
 			img.save(self.save_path / 'waypoints' / '%04d.png' % frame)
 
 	@torch.no_grad()
@@ -193,6 +194,8 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		if not self.initialized:
 			self._init()
 		tick_data = self.tick(input_data)
+
+		# #steps < #input steps: do nothing
 		if self.step < self.config.seq_len:
 			rgb = self._im_transform(tick_data['rgb']).unsqueeze(0)
 
@@ -203,7 +206,8 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 			
 			return control
 
-		gt_velocity = torch.FloatTensor([tick_data['speed']]).to('cuda', dtype=torch.float32)
+		# collect data from simulation to as model input
+		gt_velocity = torch.FloatTensor([tick_data['speed']]).to('cuda', dtype=torch.float32)	# speed passed to process_action and control_pid is not normalized
 		command = tick_data['next_command']
 		if command < 0:
 			command = 4
@@ -213,7 +217,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		cmd_one_hot[command] = 1
 		cmd_one_hot = torch.tensor(cmd_one_hot).view(1, 6).to('cuda', dtype=torch.float32)
 		speed = torch.FloatTensor([float(tick_data['speed'])]).view(1,1).to('cuda', dtype=torch.float32)
-		speed = speed / 12	# better normalization?
+		speed = speed / 12		# speed feed to the model is normalized by 12
 		rgb = self._im_transform(tick_data['rgb']).unsqueeze(0).to('cuda', dtype=torch.float32)
 
 		tick_data['target_point'] = [torch.FloatTensor([tick_data['target_point'][0]]),
@@ -226,12 +230,15 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		throttle_ctrl, brake_ctrl, steer_ctrl, metadata_ctrl = self.net.process_action(pred, tick_data['next_command'], gt_velocity, target_point)
 
 		throttle_traj, brake_traj, steer_traj, metadata_traj = self.net.control_pid(pred['pred_wp'], gt_velocity, target_point)
+  
+		# heuristics for safty?
 		if brake_traj < 0.05: brake_traj = 0.0
 		if throttle_traj > brake_traj: brake_traj = 0.0
 
 		self.pid_metadata = metadata_traj
 		control = carla.VehicleControl()
 
+		# # fuse output from ctrl and traj branches
 		# if self.status == 0:
 		# 	self.alpha = 0.3
 		# 	self.pid_metadata['agent'] = 'traj'
@@ -249,7 +256,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		control.steer = np.clip(self.alpha*steer_traj + (1-self.alpha)*steer_ctrl, -1, 1)
 		control.throttle = np.clip(self.alpha*throttle_traj + (1-self.alpha)*throttle_ctrl, 0, 0.75)
 		control.brake = np.clip(self.alpha*brake_traj + (1-self.alpha)*brake_ctrl, 0, 1)
-
+  
 
 		self.pid_metadata['steer_ctrl'] = float(steer_ctrl)
 		self.pid_metadata['steer_traj'] = float(steer_traj)
@@ -258,27 +265,30 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		self.pid_metadata['brake_ctrl'] = float(brake_ctrl)
 		self.pid_metadata['brake_traj'] = float(brake_traj)
 
+		# ??? 
 		if control.brake > 0.5:
 			control.throttle = float(0)
 
-		# if len(self.last_steers) >= 20:
-		# 	self.last_steers.popleft()
-		# self.last_steers.append(abs(float(control.steer)))
-		# #chech whether ego is turning
-		# # num of steers larger than 0.1
-		# num = 0
-		# for s in self.last_steers:
-		# 	if s > 0.10:
-		# 		num += 1
-		# if num > 10:
-		# 	self.status = 1
-		# 	self.steer_step += 1
+		if len(self.last_steers) >= 20:
+			self.last_steers.popleft()
+		self.last_steers.append(abs(float(control.steer)))
+		
+		# the ego is turning: number of steers > 0.1 is more than 10
+  		# if the ego is turning, next step use ctrl with higher weight
+		num = 0
+		for s in self.last_steers:
+			if s > 0.10:
+				num += 1
+		if num > 10:
+			self.status = 1
+			self.steer_step += 1
 
-		# else:
-		# 	self.status = 0
+		else:
+			self.status = 0
 
 		self.pid_metadata['status'] = self.status
 
+		# save frame every 10 steps
 		if SAVE_PATH is not None and self.step % 10 == 0:
 			self.save(tick_data)
 		return control
