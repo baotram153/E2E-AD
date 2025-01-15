@@ -194,7 +194,7 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 		self._plan_gps_HACK = global_plan_gps
 		self._plan_HACK = global_plan_world_coord
 
-	def 	(self):
+	def sensors (self):
 		return [
 				{
 					'type': 'sensor.camera.rgb',
