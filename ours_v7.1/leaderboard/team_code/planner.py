@@ -3,7 +3,7 @@ from collections import deque
 
 import numpy as np
 
-
+# only show debug image when HAS_DISPLAY is set
 DEBUG = int(os.environ.get('HAS_DISPLAY', 0))
 
 
@@ -37,15 +37,21 @@ class Plotter(object):
 
 
 class RoutePlanner(object):
+    ''''''
     def __init__(self, min_distance, max_distance, debug_size=256):
+        # deque of (pos, cmd)
         self.route = deque()
+        # distance in which waypoint is put
         self.min_distance = min_distance
         self.max_distance = max_distance
-
-        # self.mean = np.array([49.0, 8.0]) # for carla 9.9
-        # self.scale = np.array([111324.60662786, 73032.1570362]) # for carla 9.9
-        self.mean = np.array([0.0, 0.0]) # for carla 9.10
-        self.scale = np.array([111324.60662786, 111319.490945]) # for carla 9.10
+        
+        # # for carla 9.9
+        # self.mean = np.array([49.0, 8.0]) # center of gps data != center of map
+        # self.scale = np.array([111324.60662786, 73032.1570362])   
+        
+        # # for carla 9.10
+        self.mean = np.array([0.0, 0.0])    # center of gps data = center of map
+        self.scale = np.array([111324.60662786, 111319.490945])        # convert degrees of latitude and longitude to meters
 
         self.debug = Plotter(debug_size)
 
@@ -85,11 +91,13 @@ class RoutePlanner(object):
         farthest_in_range = -np.inf
         cumulative_distance = 0.0
 
+        # loop until cummulative distance < max_distance or distance > min_distance
         for i in range(1, len(self.route)):
             if cumulative_distance > self.max_distance:
                 break
 
             cumulative_distance += np.linalg.norm(self.route[i][0] - self.route[i-1][0])
+            
             distance = np.linalg.norm(self.route[i][0] - gps)
 
             if distance <= self.min_distance and distance > farthest_in_range:
@@ -100,7 +108,8 @@ class RoutePlanner(object):
             g = 255 * int(self.route[i][1].value == 4)
             b = 255
             self.debug.dot(gps, self.route[i][0], (r, g, b))
-
+        
+        # pop waypoints until remain 2 farthest ones in range
         for _ in range(to_pop):
             if len(self.route) > 2:
                 self.route.popleft()
@@ -110,4 +119,5 @@ class RoutePlanner(object):
         self.debug.dot(gps, gps, (0, 0, 255))
         self.debug.show()
 
+        # only return the farthest waypoint
         return self.route[1]

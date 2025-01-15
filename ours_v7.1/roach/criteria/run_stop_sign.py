@@ -21,6 +21,9 @@ class RunStopSign():
         self._affected_by_stop = False
 
     def tick(self, vehicle, timestamp):
+        '''
+        Can be used to log info if the vehicle is affected by a stop sign
+        '''
         info = None
         ev_loc = vehicle.get_location()
         ev_f_vec = vehicle.get_transform().get_forward_vector()

@@ -19,6 +19,7 @@ from leaderboard.autoagents import autonomous_agent
 
 from TCP.model import TCP
 from TCP.config import GlobalConfig
+
 from team_code.planner import RoutePlanner
 
 
@@ -45,6 +46,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		self.initialized = False
 
 		self.config = GlobalConfig()
+  
 		self.net = TCP(self.config)
 
 
@@ -210,6 +212,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		self.pid_metadata = metadata_traj
 		control = carla.VehicleControl()
 
+		# # Fusing the ctrl and traj branch
 		# if self.status == 0:
 		# 	self.alpha = 0.3
 		# 	self.pid_metadata['agent'] = 'traj'
@@ -239,6 +242,7 @@ class TCPAgent(autonomous_agent.AutonomousAgent):
 		if control.brake > 0.5:
 			control.throttle = float(0)
 
+		# # Detect whether the ego is turning
 		# if len(self.last_steers) >= 20:
 		# 	self.last_steers.popleft()
 		# self.last_steers.append(abs(float(control.steer)))

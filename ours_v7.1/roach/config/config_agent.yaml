@@ -47,7 +47,7 @@ obs_configs:
   birdview_seg_data:
     width_in_pixels: 200
     pixels_ev_to_bottom: 100
-    pixels_per_meter: 5.0
+    pixels_per_meter: 5.0    # 40 meters in bev frame
     history_idx:
     - -16
     - -11

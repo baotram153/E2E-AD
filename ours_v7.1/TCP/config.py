@@ -4,13 +4,13 @@ import torch
 from plugins.lift_splat_shoot.src.tools import img_transform
 
 class GlobalConfig:
-	""" base architecture configurations """
+	""" ---------------Base architecture configurations----------------- """
 	# evaluate options
 	draw_wps = False
 
 	# Data
-	seq_len = 1 # input timesteps
-	pred_len = 4 # future waypoints predicted
+	seq_len = 1 	# input timesteps
+	pred_len = 4 	# future waypoints predicted
 
 	# data root
 	root_dir_all = "/workspace/datasets/CARLA-data/"
@@ -52,7 +52,7 @@ class GlobalConfig:
 	speed_KD = 1.0
 	speed_n = 40 	# buffer size
 
-	# LSS module
+	"-----------------LiftSplatShoot Configuration-----------------" 
 	H=900
 	W=1600
 	resize_lim=(0.193, 0.225)
@@ -123,15 +123,10 @@ class GlobalConfig:
 
 	# build translation matrix
 	translation = torch.Tensor([0, 2, 1.5])    # DriveAdapter
-    
-	# rots = []
-	# trans = []
-	# intrins = []
-	# post_rots = []
-	# post_trans = []
         
 	# img.save("imgs/augmented_img.png")
 
+	"-----------------Hyperparams for Controls processing-----------------"
 	max_throttle = 0.75 # upper limit on throttle signal value in dataset
 	brake_speed = 0.4 	# desired speed below which brake is triggered -> lower the speed under this threshold to brake 
 	brake_ratio = 1.1 	# ratio of speed to desired speed at which brake is triggered -> increase smooth when brake
@@ -147,7 +142,10 @@ class GlobalConfig:
 	value_weight = 0.001
 	features_weight = 0.01
 	
+	
+	"-----------------Teacher Checkpoint-----------------"
 	rl_ckpt = "roach/log/ckpt_11833344.pth"
+	coach_config_path = "roach/config/config_agent.yaml"
 
 	img_aug = True
 

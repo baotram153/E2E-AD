@@ -4,33 +4,40 @@ import datetime
 import pathlib
 import time
 import cv2
+import carla
+from collections import deque
+import math
+from collections import OrderedDict
 
 import torch
 import carla
 import numpy as np
 from PIL import Image
+from torchvision import transforms as T
 
 from leaderboard.autoagents import autonomous_agent
-import numpy as np
-from omegaconf import OmegaConf
 
+from TCP.model import TCP
+from TCP.config import GlobalConfig
+from team_code.planner import RoutePlanner
+
+# for roach (coach)
 from roach.criteria import run_stop_sign
 from roach.obs_manager.birdview.chauffeurnet import ObsManager
 from roach.utils.config_utils import load_entry_point
 import roach.utils.transforms as trans_utils
 from roach.utils.traffic_light import TrafficLightHandler
 
-from srunner.scenariomanager.carla_data_provider import CarlaDataProvider
+from omegaconf import OmegaConf
 from leaderboard.utils.route_manipulation import downsample_route
+from scenario_runner.srunner.scenariomanager.carla_data_provider import CarlaDataProvider
 from agents.navigation.local_planner import RoadOption
-
-from team_code.planner import RoutePlanner
-
 
 SAVE_PATH = os.environ.get('SAVE_PATH', None)
 
+
 def get_entry_point():
-	return 'ROACHAgent'
+	return 'TCPRoachAgent'
 
 def _numpy(carla_vector, normalize=False):
 	result = np.float32([carla_vector.x, carla_vector.y])
@@ -39,11 +46,6 @@ def _numpy(carla_vector, normalize=False):
 		return result / (np.linalg.norm(result) + 1e-4)
 
 	return result
-
-
-def _location(x, y, z):
-	return carla.Location(x=float(x), y=float(y), z=float(z))
-
 
 def get_xyz(_):
 	return [_.x, _.y, _.z]
@@ -66,39 +68,69 @@ def get_collision(p1, v1, p2, v2):
 	return collides, p1 + x[0] * v1
 
 
-class ROACHAgent(autonomous_agent.AutonomousAgent):
-	def setup(self, path_to_conf_file, ckpt="roach/log/ckpt_11833344.pth"):
-		self._render_dict = None
-		self.supervision_dict = None
-		self._ckpt = ckpt
+class TCPRoachAgent(autonomous_agent.AutonomousAgent):
+	def setup(self, chkpt_path):
+		self.track = autonomous_agent.Track.SENSORS
+		self.alpha = 0	# this is important
+		self.status = 1
+		self.steer_step = 0
+		self.last_moving_status = 0
+		self.last_moving_step = -1
+		self.last_steers = deque()
+
+		self.chkpt_path = chkpt_path
+		self.step = -1
+		self.wall_start = time.time()
+		self.initialized = False	# flag to initialze agent before running
+
+		self.config = GlobalConfig()
+		self.net = TCP(self.config)
   
-		cfg = OmegaConf.load(path_to_conf_file)
-		cfg = OmegaConf.to_container(cfg)
-		self.cfg = cfg
-		self._obs_configs = cfg['obs_configs']
-		self._train_cfg = cfg['training']
-		self._policy_class = load_entry_point(cfg['policy']['entry_point'])
-		self._policy_kwargs = cfg['policy']['kwargs']
+		ckpt = torch.load(self.chkpt_path)	
+		ckpt = ckpt["state_dict"]
+		new_state_dict = OrderedDict()
+		for key, value in ckpt.items():
+			new_key = key.replace("model.","")
+			new_state_dict[new_key] = value
+		self.net.load_state_dict(new_state_dict, strict = False)
+		self.net.cuda()
+		self.net.eval()
+  
+		self.takeover = False
+		self.stop_time = 0
+		self.takeover_time = 0
+
+		self.save_path = None
+  
+		# normalize image with mean, std of imagenet
+		self._im_transform = T.Compose([T.ToTensor(), T.Normalize(mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225])])
+
+		# store steering values to determine if the vehicle is turning or not
+		self.last_steers = deque()
+  
+		# coach config
+		self.coach_config_path = self.config.coach_config_path
+		coach_config = OmegaConf.load(self.coach_config)
+		self.coach_config = OmegaConf.to_container(coach_config)
+  
+		self._obs_configs = self.coach_config['obs_configs']
+		self._train_cfg = self.coach_config['training']
+		self._policy_class = load_entry_point(self.coach_config['policy']['entry_point'])
+		self._policy_kwargs = self.coach_config['policy']['kwargs']
+
 		if self._ckpt is None:
 			self._policy = None
 		else:
 			# why has to save to self._train_cfg['kwargs']?
 			self._policy, self._train_cfg['kwargs'] = self._policy_class.load(self._ckpt)
 			self._policy = self._policy.eval()
-		self._wrapper_class = load_entry_point(cfg['env_wrapper']['entry_point'])
-		self._wrapper_kwargs = cfg['env_wrapper']['kwargs']
+		self._wrapper_class = load_entry_point(self.coach_config['env_wrapper']['entry_point'])
+		self._wrapper_kwargs = self.coach_config['env_wrapper']['kwargs']
 
-		self.track = autonomous_agent.Track.SENSORS
-		self.config_path = path_to_conf_file
-		self.step = -1
-		self.wall_start = time.time()
-		self.initialized = False
 
 		self._3d_bb_distance = 50
-
 		self.prev_lidar = None
 
-		self.save_path = None
 		if SAVE_PATH is not None:
 			now = datetime.datetime.now()
 			string = pathlib.Path(os.environ['ROUTES']).stem + '_'
@@ -108,56 +140,49 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 			self.save_path = pathlib.Path(os.environ['SAVE_PATH']) / string
 			self.save_path.mkdir(parents=True, exist_ok=False)
 
+			(self.save_path / 'meta').mkdir()
 			(self.save_path / 'rgb').mkdir()
 			(self.save_path / 'measurements').mkdir()
-			(self.save_path / 'supervision').mkdir()
 			(self.save_path / 'bev').mkdir()
+			(self.save_path / 'supervision').mkdir()
 
 	def _init(self):
-		self._waypoint_planner = RoutePlanner(4.0, 50)
-		self._waypoint_planner.set_route(self._plan_gps_HACK, True)
-
-		self._command_planner = RoutePlanner(7.5, 25.0, 257)
-		self._command_planner.set_route(self._global_plan, True)
-
+		# remmeber to set self._global_plan and self._plan_gps_HACK
 		self._route_planner = RoutePlanner(4.0, 50.0)
 		self._route_planner.set_route(self._global_plan, True)
 
+		# for coach
+		self._waypoint_planner = RoutePlanner(4.0, 50)
+		self._waypoint_planner.set_route(self._plan_gps_HACK, True)
+
+		# command_planner have larger range than waypoint_planner
+		self._command_planner = RoutePlanner(7.5, 25.0, 257)
+		self._command_planner.set_route(self._global_plan, True)
+  
+		# set up simulation for student to collect data (normally student used precollected data)
 		self._world = CarlaDataProvider.get_world()
 		self._map = self._world.get_map()
 		self._ego_vehicle = CarlaDataProvider.get_ego()
 		self._last_route_location = self._ego_vehicle.get_location()
 		self._criteria_stop = run_stop_sign.RunStopSign(self._world)
-		self.birdview_obs_manager = ObsManager(self.cfg['obs_configs']['birdview'], self._criteria_stop)
+		self.birdview_obs_manager = ObsManager(self.coach_config['obs_configs']['birdview'], self._criteria_stop)
 		self.birdview_obs_manager.attach_ego_vehicle(self._ego_vehicle)
 
-		self.navigation_idx = -1
-
-
-		# for stop signs
-		self._target_stop_sign = None # the stop sign affecting the ego vehicle
-		self._stop_completed = False # if the ego vehicle has completed the stop sign
-		self._affected_by_stop = False # if the ego vehicle is influenced by a stop sign
-
-		TrafficLightHandler.reset(self._world)
-		print("initialized")
-
+		self.navigation_idx = -1	#???
+  
 		self.initialized = True
 
-	def _get_angle_to(self, pos, theta, target):
-		R = np.array([
-			[np.cos(theta), -np.sin(theta)],
-			[np.sin(theta),  np.cos(theta)],
-			])
+	def _get_position(self, tick_data):
+		gps = tick_data['gps']
+		gps = (gps - self._route_planner.mean) * self._route_planner.scale
 
-		aim = R.T.dot(target - pos)
-		angle = -np.degrees(np.arctan2(-aim[1], aim[0]))
-		angle = 0.0 if np.isnan(angle) else angle 
-
-		return angle
-	
+		return gps
 
 	def _truncate_global_route_till_local_target(self, windows_size=5):
+		'''
+		Check if the ego has pass any next wps of the global route, then truncate self.global_route to the remaining wps that ev must pass
+		:param windows_size: number of ahead wps to check
+  		'''
 		ev_location = self._ego_vehicle.get_location()
 		closest_idx = 0
 		for i in range(len(self._global_route)-1):
@@ -177,19 +202,17 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 			self._last_route_location = carla.Location(self._global_route[0][0].transform.location)
 
 		self._global_route = self._global_route[closest_idx:]
-
-	def _get_position(self, tick_data):
-		gps = tick_data['gps']
-		gps = (gps - self._command_planner.mean) * self._command_planner.scale
-
-		return gps
-
+  
 	def set_global_plan(self, global_plan_gps, global_plan_world_coord, wp_route):
 		"""
 		Set the plan (route) for the agent
+		Used in leaderboard.scenarios.route_scenario
+		:param global_plan_gps:
+		:param global_plan_world_coord:
+		:param wp_route list of wps corresponding to predefined route
 		"""
 		self._global_route = wp_route
-		ds_ids = downsample_route(global_plan_world_coord, 50)
+		ds_ids = downsample_route(global_plan_world_coord, 50)	 # idxs of (wp, opt)
 		self._global_plan = [global_plan_gps[x] for x in ds_ids]
 		self._global_plan_world_coord = [(global_plan_world_coord[x][0], global_plan_world_coord[x][1]) for x in ds_ids]
 
@@ -197,7 +220,7 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 		self._plan_HACK = global_plan_world_coord
 
 	def sensors(self):
-		return [
+				return [
 				{
 					'type': 'sensor.camera.rgb',
 					'x': -1.5, 'y': 0.0, 'z':2.0,
@@ -205,6 +228,13 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 					'width': 900, 'height': 256, 'fov': 100,
 					'id': 'rgb'
 					},
+				{	# TCP agent get bev as input? -> just for visualization
+					'type': 'sensor.camera.rgb',
+					'x': 0.0, 'y': 0.0, 'z': 50.0,
+					'roll': 0.0, 'pitch': -90.0, 'yaw': 0.0,
+					'width': 512, 'height': 512, 'fov': 5 * 10.0,
+					'id': 'bev'
+					},	
 				{
 					'type': 'sensor.other.imu',
 					'x': 0.0, 'y': 0.0, 'z': 0.0,
@@ -227,6 +257,12 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 				]
 
 	def tick(self, input_data, timestamp):
+		'''
+		Get input data from student's sensors (no need to preprocess like TCP) -> feed into coach -> get supervisio -> save data
+		:param input_data: student's sensors data
+		:param timestamp: feed into self.stop_criteria
+  		'''
+		# collect data for coach
 		self._truncate_global_route_till_local_target()
 
 		birdview_obs = self.birdview_obs_manager.get_observation(self._global_route)
@@ -242,9 +278,7 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 		vel_w = self._ego_vehicle.get_velocity()
 		vel_ev = trans_utils.vec_global_to_ref(vel_w, ev_transform.rotation)
 		vel_xy = np.array([vel_ev.x, vel_ev.y], dtype=np.float32)
-
-		self._criteria_stop.tick(self._ego_vehicle, timestamp)
-
+  
 		state_list = []
 		state_list.append(throttle)
 		state_list.append(steer)
@@ -252,19 +286,24 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 		state_list.append(gear)
 		state_list.append(vel_xy)
 		state = np.concatenate(state_list)
+  
 		obs_dict = {
 			'state': state.astype(np.float32),
 			'birdview': birdview_obs['masks'],
 		}
 
 		rgb = cv2.cvtColor(input_data['rgb'][1][:, :, :3], cv2.COLOR_BGR2RGB)
-
+		# bev = cv2.cvtColor(input_data['bev'][1][:, :, :3], cv2.COLOR_BGR2RGB)
 		gps = input_data['gps'][1][:2]
 		speed = input_data['speed'][1]['speed']
 		compass = input_data['imu'][1][-1]
-
+		
+		# the compass may send nan in a few frames
+		if (math.isnan(compass) == True): 
+			compass = 0.0
+   
 		target_gps, target_command = self.get_target_gps(input_data['gps'][1], compass)
-
+		
 		weather = self._weather_to_dict(self._world.get_weather())
 
 		result = {
@@ -274,23 +313,38 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 				'compass': compass,
 				'weather': weather,
 				}
-		next_wp, next_cmd = self._route_planner.run_step(self._get_position(result))
 
+		next_wp, next_cmd = self._route_planner.run_step(self._get_position(result))
+  
 		result['next_command'] = next_cmd.value
 		result['x_target'] = next_wp[0]
 		result['y_target'] = next_wp[1]
+  
+		# collect other data for students
+		theta = compass + np.pi/2
+		R = np.array([
+			[np.cos(theta), -np.sin(theta)],
+			[np.sin(theta), np.cos(theta)]
+			])
 
-		
+		pos = self._get_position(result)
+		# target_point is actually delta between next_wp and current pos of ev
+		local_command_point = np.array([next_wp[0]-pos[0], next_wp[1]-pos[1]])
+		local_command_point = R.T.dot(local_command_point)
+		result['target_point'] = tuple(local_command_point)
+
 		return result, obs_dict, birdview_obs['rendered'], target_gps, target_command
 
 	def im_render(self, render_dict):
+		'''
+		Combine rendered image with action and debug info
+  		'''
 		im_birdview = render_dict['rendered']
 		h, w, c = im_birdview.shape
 		im = np.zeros([h, w*2, c], dtype=np.uint8)
 		im[:h, :w] = im_birdview
 
 		action_str = np.array2string(render_dict['action'], precision=2, separator=',', suppress_small=True)
-
 	
 		txt_1 = f'a{action_str}'
 		im = cv2.putText(im, txt_1, (3, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
@@ -304,46 +358,51 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 
 	@torch.no_grad()
 	def run_step(self, input_data, timestamp):
+		'''
+		Feed tick data to both TCP and Roach
+		- Only TCP is used for control -> feed to simulation
+		- Roach is used for supervision -> save
+  		'''
 		if not self.initialized:
 			self._init()
-
+   
 		self.step += 1
-
-		if self.step < 20:
+   
+		# control: TCP
+		if self.step < self.config.seq_len:
 
 			control = carla.VehicleControl()
 			control.steer = 0.0
 			control.throttle = 0.0
 			control.brake = 0.0
-			self.last_control = control
-			return control
+			
+			return control  
 
-		if self.step % 2 != 0:
-			return self.last_control
+		# collect data from simulation -> feed to coach
 		tick_data, policy_input, rendered, target_gps, target_command = self.tick(input_data, timestamp)
-
+  
 		gps = self._get_position(tick_data)
-
 		near_node, near_command = self._waypoint_planner.run_step(gps)
 		far_node, far_command = self._command_planner.run_step(gps)
 
 		actions, values, log_probs, mu, sigma, features = self._policy.forward(
 			policy_input, deterministic=True, clip_action=True)
 		control = self.process_act(actions)
-
+  
 		render_dict = {"rendered": rendered, "action": actions}
 
 		# additional collision detection to enhance safety
-		should_brake = self.collision_detect()
+		should_brake = self.collision_detect()	# heuristic for detect collision???
 		only_ap_brake = True if (control.brake <= 0 and should_brake) else False
 		if should_brake:
 			control.steer = control.steer * 0.5
 			control.throttle = 0.0
 			control.brake = 1.0
+   
 		render_dict = {"rendered": rendered, "action": actions, "should_brake":str(should_brake),}
-			
+  
 		render_img = self.im_render(render_dict)
-
+  
 		supervision_dict = {
 			'action': np.array([control.throttle, control.steer, control.brake], dtype=np.float32),
 			'value': values[0],
@@ -356,12 +415,92 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 			'should_brake': should_brake,
 			'only_ap_brake': only_ap_brake,
 		}
+   
+		# feed data to TCP to get control
+		gt_velocity = torch.FloatTensor([tick_data['speed']]).to('cuda', dtype=torch.float32)
+  
+		command = tick_data['next_command']
+		if command < 0:
+			command = 4
+		command -= 1
+		assert command in [0, 1, 2, 3, 4, 5]
+		cmd_one_hot = [0] * 6
+		cmd_one_hot[command] = 1
+		cmd_one_hot = torch.tensor(cmd_one_hot).view(1, 6).to('cuda', dtype=torch.float32)
+  
+		speed = torch.FloatTensor([float(tick_data['speed'])]).view(1,1).to('cuda', dtype=torch.float32)
+		speed = speed / 12	# better normalization?
+  
+		rgb = self._im_transform(tick_data['rgb']).unsqueeze(0).to('cuda', dtype=torch.float32)
+
+		tick_data['target_point'] = [torch.FloatTensor([tick_data['target_point'][0]]),
+										torch.FloatTensor([tick_data['target_point'][1]])]
+		target_point = torch.stack(tick_data['target_point'], dim=1).to('cuda', dtype=torch.float32)
+		state = torch.cat([speed, target_point, cmd_one_hot], 1)
+
+		pred= self.net(rgb, state, target_point)
+
+		throttle_ctrl, brake_ctrl, steer_ctrl, metadata_ctrl = self.net.process_action(pred, tick_data['next_command'], gt_velocity, target_point)
+
+		throttle_traj, brake_traj, steer_traj, metadata_traj = self.net.control_pid(pred['pred_wp'], gt_velocity, target_point)
+  
+		# heuristics for safty?
+		if brake_traj < 0.05: brake_traj = 0.0
+		if throttle_traj > brake_traj: brake_traj = 0.0
+
+		self.pid_metadata = metadata_traj
+		control = carla.VehicleControl()
+
+        # # Fuse ctrl and traj output
+		# if self.status == 0:
+		# 	self.alpha = 0.3
+		# 	self.pid_metadata['agent'] = 'traj'
+		# 	control.steer = np.clip(self.alpha*steer_ctrl + (1-self.alpha)*steer_traj, -1, 1)
+		# 	control.throttle = np.clip(self.alpha*throttle_ctrl + (1-self.alpha)*throttle_traj, 0, 0.75)
+		# 	control.brake = np.clip(self.alpha*brake_ctrl + (1-self.alpha)*brake_traj, 0, 1)
+		# else:
+		# 	self.alpha = 0.3
+		# 	self.pid_metadata['agent'] = 'ctrl'
+		# 	control.steer = np.clip(self.alpha*steer_traj + (1-self.alpha)*steer_ctrl, -1, 1)
+		# 	control.throttle = np.clip(self.alpha*throttle_traj + (1-self.alpha)*throttle_ctrl, 0, 0.75)
+		# 	control.brake = np.clip(self.alpha*brake_traj + (1-self.alpha)*brake_ctrl, 0, 1)
+
+		self.pid_metadata['agent'] = 'ctrl'
+		control.steer = np.clip(self.alpha*steer_traj + (1-self.alpha)*steer_ctrl, -1, 1)
+		control.throttle = np.clip(self.alpha*throttle_traj + (1-self.alpha)*throttle_ctrl, 0, 0.75)
+		control.brake = np.clip(self.alpha*brake_traj + (1-self.alpha)*brake_ctrl, 0, 1)
+
+		self.pid_metadata['steer_ctrl'] = float(steer_ctrl)
+		self.pid_metadata['steer_traj'] = float(steer_traj)
+		self.pid_metadata['throttle_ctrl'] = float(throttle_ctrl)
+		self.pid_metadata['throttle_traj'] = float(throttle_traj)
+		self.pid_metadata['brake_ctrl'] = float(brake_ctrl)
+		self.pid_metadata['brake_traj'] = float(brake_traj)
+
+		if control.brake > 0.5:
+			control.throttle = float(0)
+
+		# if len(self.last_steers) >= 20:
+		# 	self.last_steers.popleft()
+		# self.last_steers.append(abs(float(control.steer)))
+		# #chech whether ego is turning
+		# # num of steers larger than 0.1
+		# num = 0
+		# for s in self.last_steers:
+		# 	if s > 0.10:
+		# 		num += 1
+		# if num > 10:
+		# 	self.status = 1
+		# 	self.steer_step += 1
+
+		# else:
+		# 	self.status = 0
+
+		self.pid_metadata['status'] = self.status
+  
 		if SAVE_PATH is not None and self.step % 10 == 0:
 			self.save(near_node, far_node, near_command, far_command, tick_data, supervision_dict, render_img, should_brake)
 
-		steer = control.steer
-		control.steer = steer + 1e-2 * np.random.randn()
-		self.last_control = control
 		return control
 
 	def collision_detect(self):
@@ -439,7 +578,9 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 
 		return None
 
+	# from Roach
 	def save(self, near_node, far_node, near_command, far_command, tick_data, supervision_dict, render_img, should_brake):
+    
 		frame = self.step // 10 - 2
 
 		Image.fromarray(tick_data['rgb']).save(self.save_path / 'rgb' / ('%04d.png' % frame))
@@ -464,9 +605,15 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 				'y_target': tick_data['y_target'],
 				'target_command': tick_data['next_command'],
 				}
+  
 		outfile = open(self.save_path / 'measurements' / ('%04d.json' % frame), 'w')
 		json.dump(data, outfile, indent=4)
 		outfile.close()
+
+		outfile = open(self.save_path / 'meta' / ('%04d.json' % frame), 'w')
+		json.dump(self.pid_metadata, outfile, indent=4)
+		outfile.close()
+  
 		with open(self.save_path / 'supervision' / ('%04d.npy' % frame), 'wb') as f:
 			np.save(f, supervision_dict)
 		
@@ -636,3 +783,7 @@ class ROACHAgent(autonomous_agent.AutonomousAgent):
 		matrix[2, 2] = c_p * c_r
 		return matrix
 
+
+	def destroy(self):
+		del self.net
+		torch.cuda.empty_cache()
