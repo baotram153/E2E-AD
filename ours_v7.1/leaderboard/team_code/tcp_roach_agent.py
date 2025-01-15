@@ -30,7 +30,7 @@ from roach.utils.traffic_light import TrafficLightHandler
 
 from omegaconf import OmegaConf
 from leaderboard.utils.route_manipulation import downsample_route
-from scenario_runner.srunner.scenariomanager.carla_data_provider import CarlaDataProvider
+from srunner.scenariomanager.carla_data_provider import CarlaDataProvider
 from agents.navigation.local_planner import RoadOption
 
 SAVE_PATH = os.environ.get('SAVE_PATH', None)
@@ -69,7 +69,7 @@ def get_collision(p1, v1, p2, v2):
 
 
 class TCPRoachAgent(autonomous_agent.AutonomousAgent):
-	def setup(self, chkpt_path):
+	def setup(self, chkpt_path, coach_chkpt="roach/log/ckpt_11833344.pth"):
 		self.track = autonomous_agent.Track.SENSORS
 		self.alpha = 0	# this is important
 		self.status = 1
@@ -118,6 +118,7 @@ class TCPRoachAgent(autonomous_agent.AutonomousAgent):
 		self._policy_class = load_entry_point(self.coach_config['policy']['entry_point'])
 		self._policy_kwargs = self.coach_config['policy']['kwargs']
 
+		self._ckpt = coach_chkpt
 		if self._ckpt is None:
 			self._policy = None
 		else:
