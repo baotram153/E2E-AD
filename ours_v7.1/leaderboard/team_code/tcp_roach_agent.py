@@ -33,6 +33,8 @@ from leaderboard.utils.route_manipulation import downsample_route
 from srunner.scenariomanager.carla_data_provider import CarlaDataProvider
 from agents.navigation.local_planner import RoadOption
 
+from plugins.lift_splat_shoot.src.tools import img_transform, normalize_img
+
 SAVE_PATH = os.environ.get('SAVE_PATH', None)
 
 
@@ -101,6 +103,23 @@ class TCPRoachAgent(autonomous_agent.AutonomousAgent):
 		self.takeover_time = 0
 
 		self.save_path = None
+
+		# LSS module
+		H=900
+		W=1600
+		final_dim=(128, 352)
+		bot_pct_lim=(0.0, 0.22)
+
+		# rots, trans, intrins, post_rots, post_trans
+		fH, fW = final_dim
+		self.resize = max(fH/H, fW/W)
+		self.resize_dims = (int(W*self.resize), int(H*self.resize))
+		newW, newH = self.resize_dims
+		crop_h = int((1 - np.mean(bot_pct_lim))*newH) - fH    # what if this is negative? -> padding, chấp nhận cắt phần dưới :v
+		crop_w = int(max(0, newW - fW) / 2)
+		self.crop = (crop_w, crop_h, crop_w + fW, crop_h + fH)
+		self.flip = False
+		self.rotate = 0
   
 		# normalize image with mean, std of imagenet
 		self._im_transform = T.Compose([T.ToTensor(), T.Normalize(mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225])])
@@ -110,7 +129,7 @@ class TCPRoachAgent(autonomous_agent.AutonomousAgent):
   
 		# coach config
 		self.coach_config_path = self.config.coach_config_path
-		coach_config = OmegaConf.load(self.coach_config)
+		coach_config = OmegaConf.load(self.coach_config_path)
 		self.coach_config = OmegaConf.to_container(coach_config)
   
 		self._obs_configs = self.coach_config['obs_configs']
@@ -367,17 +386,7 @@ class TCPRoachAgent(autonomous_agent.AutonomousAgent):
 		if not self.initialized:
 			self._init()
    
-		self.step += 1
-   
-		# control: TCP
-		if self.step < self.config.seq_len:
-
-			control = carla.VehicleControl()
-			control.steer = 0.0
-			control.throttle = 0.0
-			control.brake = 0.0
-			
-			return control  
+		self.step += 1 
 
 		# collect data from simulation -> feed to coach
 		tick_data, policy_input, rendered, target_gps, target_command = self.tick(input_data, timestamp)
@@ -416,10 +425,40 @@ class TCPRoachAgent(autonomous_agent.AutonomousAgent):
 			'should_brake': should_brake,
 			'only_ap_brake': only_ap_brake,
 		}
+		rgb = Image.fromarray(tick_data['rgb'])
+		post_rot = torch.eye(2)
+		post_tran = torch.zeros(2)
+
+		if self.step < self.config.seq_len:		# ??? save
+			# rgb = self._im_transform(tick_data['rgb']).unsqueeze(0)
+			img_transformed, post_rot2, post_tran2 = img_transform(rgb, post_rot, post_tran,
+												resize=self.resize,
+												resize_dims=self.resize_dims,
+												crop=self.crop,
+												flip=self.flip,
+												rotate=self.rotate,
+												)
+			# img_transformed_norm = normalize_img(img).unsqueeze(0)
+			img_transformed_norm = normalize_img(img_transformed).unsqueeze(0)
+			rgb = img_transformed_norm.unsqueeze(0).to('cuda', dtype=torch.float32)
+			
+			post_tran = torch.zeros(3)
+			post_rot = torch.eye(3)
+			post_tran[:2] = post_tran2
+			post_rot[:2, :2] = post_rot2
+
+			post_rots = post_rot.unsqueeze(0).to('cuda', dtype=torch.float32)	# add batch dim
+			post_trans = post_tran.unsqueeze(0).to('cuda', dtype=torch.float32)
+
+			control = carla.VehicleControl()
+			control.steer = 0.0
+			control.throttle = 0.0
+			control.brake = 0.0
+			return control
+
    
 		# feed data to TCP to get control
 		gt_velocity = torch.FloatTensor([tick_data['speed']]).to('cuda', dtype=torch.float32)
-  
 		command = tick_data['next_command']
 		if command < 0:
 			command = 4
@@ -428,18 +467,36 @@ class TCPRoachAgent(autonomous_agent.AutonomousAgent):
 		cmd_one_hot = [0] * 6
 		cmd_one_hot[command] = 1
 		cmd_one_hot = torch.tensor(cmd_one_hot).view(1, 6).to('cuda', dtype=torch.float32)
-  
 		speed = torch.FloatTensor([float(tick_data['speed'])]).view(1,1).to('cuda', dtype=torch.float32)
 		speed = speed / 12	# better normalization?
-  
-		rgb = self._im_transform(tick_data['rgb']).unsqueeze(0).to('cuda', dtype=torch.float32)
+
+		# rgb = self._im_transform(tick_data['rgb']).unsqueeze(0).to('cuda', dtype=torch.float32)
+		img_transformed, post_rot2, post_tran2 = img_transform(rgb, post_rot, post_tran,
+												resize=self.resize,
+												resize_dims=self.resize_dims,
+												crop=self.crop,
+												flip=self.flip,
+												rotate=self.rotate,
+												)
+		
+		# img_transformed_norm = normalize_img(img).unsqueeze(0)
+		img_transformed_norm = normalize_img(img_transformed).unsqueeze(0)
+		rgb = img_transformed_norm.unsqueeze(0).to('cuda', dtype=torch.float32)
+		
+		post_tran = torch.zeros(3)
+		post_rot = torch.eye(3)
+		post_tran[:2] = post_tran2
+		post_rot[:2, :2] = post_rot2
+		post_rots = post_rot.unsqueeze(0).to('cuda', dtype=torch.float32)	# add batch dim
+		post_trans = post_tran.unsqueeze(0).to('cuda', dtype=torch.float32)
 
 		tick_data['target_point'] = [torch.FloatTensor([tick_data['target_point'][0]]),
 										torch.FloatTensor([tick_data['target_point'][1]])]
 		target_point = torch.stack(tick_data['target_point'], dim=1).to('cuda', dtype=torch.float32)
 		state = torch.cat([speed, target_point, cmd_one_hot], 1)
 
-		pred= self.net(rgb, state, target_point)
+		# pred= self.net(rgb, state, target_point)
+		pred = self.net(rgb, post_trans, post_rots, state, target_point)
 
 		throttle_ctrl, brake_ctrl, steer_ctrl, metadata_ctrl = self.net.process_action(pred, tick_data['next_command'], gt_velocity, target_point)
 

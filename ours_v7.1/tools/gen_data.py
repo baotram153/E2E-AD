@@ -71,6 +71,7 @@ def gen_single_route(route_folder):
 		full_seq_action_mu.append(roach_supervision_data['action_mu'])
 		full_seq_action_sigma.append(roach_supervision_data['action_sigma'])
 		full_seq_only_ap_brake.append(roach_supervision_data['only_ap_brake'])
+		print(roach_supervision_data)
 
 	for i in range(INPUT_FRAMES-1, length-FUTURE_FRAMES):
 
@@ -204,7 +205,7 @@ def gen_sub_folder(folder_path):
 
 if __name__ == '__main__':
 	global data_path
-	data_path = "/workspace/datasets/CARLA-data"
+	data_path = "/workspace/datasets/CARLA-bev-seg-data"
 	towns = ["town01","town01_addition","town02","town02_val","town03","town03_addition", "town04", "town04_addition", "town05", "town05_val","town06", "town06_addition","town07", "town07_val", "town10","town10_val"]
 	# towns = ["towndebug"]
 	pattern = "data_collect_{}" # town type

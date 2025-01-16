@@ -1,4 +1,5 @@
 #!/bin/bash
+export CUDA_VISIBLE_DEVICES=1
 export CARLA_ROOT=/workspace/simulation
 export CARLA_SERVER=${CARLA_ROOT}/CarlaUE4.sh
 export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI
@@ -21,8 +22,8 @@ export DATA_COLLECTION=True
 # Roach data collection
 export ROUTES=leaderboard/data/TCP_training_routes/routes_town01.xml     #
 export TEAM_AGENT=team_code/tcp_roach_agent.py
-export TEAM_CONFIG=roach/config/config_agent.yaml
-export CHECKPOINT_ENDPOINT=4090/data_collect_town01_results.json         #
+export TEAM_CONFIG="/workspace/log/TCP/chkpt/ours_v7/debug/best_epoch=29-val_loss=0.846.ckpt"
+export CHECKPOINT_ENDPOINT=3090/data_collect_town01_results.json         #
 export SCENARIOS=leaderboard/data/scenarios/town01_all_scenarios.json             #
 export SAVE_PATH=/workspace/datasets/CARLA-bev-seg-data/data_collect_town01/     #                          
 
